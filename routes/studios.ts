@@ -11,8 +11,14 @@ import {
 const Studio = {
   type: 'object',
   properties: {
-    id: { type: 'string' },
+    id: { type: 'number' },
     name: { type: 'string' },
+    address: { type: 'string' },
+    city: { type: 'string' },
+    postalCode: { type: 'number' },
+    ownerId: { type: 'number' },
+    longitude: { type: 'string' },
+    latitude: { type: 'string' },
   },
 };
 
