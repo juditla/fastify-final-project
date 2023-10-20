@@ -19,6 +19,7 @@ export type Artist = {
   id: number;
   style: string;
   studioId: number;
+  userId: number
   name: string;
   description: string;
 };
