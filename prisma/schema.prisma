@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Studio {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(30)
+  address     String   @db.VarChar(50)
+  city        String   @default("Vienna") @db.VarChar(30)
+  postal_code Int
+  longitude   String?  @db.VarChar(30)
+  latitude    String?  @db.VarChar(30)
+  ownerId     Int
+  Artist      Artist[]
+  owner       User     @relation(fields: [ownerId], references: [id])
+
+  @@unique([name, address, postal_code])
+}
+
+model Artist {
+  id            Int             @id @default(autoincrement())
+  name          String          @db.VarChar(30)
+  style         String
+  description   String
+  studioId      Int
+  userId        Int             @unique
+  studio        Studio          @relation(fields: [studioId], references: [id])
+  user          User            @relation(fields: [userId], references: [id])
+  Studio_Images Studio_Images[]
+  Tattoo_Images Tattoo_Images[]
+}
+
+model Tattoo_Images {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(30)
+  picture     String  @db.VarChar(100)
+  artistId    Int
+  style       String
+  is_wannado  Boolean
+  is_reserved Boolean
+  is_done     Boolean
+  artist      Artist  @relation(fields: [artistId], references: [id])
+}
+
+model Studio_Images {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(30)
+  picture  String @db.VarChar(100)
+  studioId Int
+  studio   Artist @relation(fields: [studioId], references: [id])
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(30)
+  User User[]
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  roleId      Int
+  create_date DateTime @default(now())
+  first_name  String   @db.VarChar(30)
+  last_name   String   @db.VarChar(30)
+  password    String   @db.VarChar(30)
+  Artist      Artist?
+  Studio      Studio[]
+  role        Role     @relation(fields: [roleId], references: [id])
+}

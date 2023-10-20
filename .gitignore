@@ -1,3 +1,4 @@
 node_modules
 dist/
 issueDescription.md
+.env

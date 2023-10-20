@@ -1,6 +1,9 @@
+import { PrismaClient } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { studios } from '../data.js';
 import { ParamsIdRequest } from '../types.js';
+
+const prisma = new PrismaClient();
 
 type AddStudioRequest = FastifyRequest<{
   Body: {
@@ -28,14 +31,15 @@ type UpdateStudioRequest = FastifyRequest<{
   };
 }>;
 
-export const getStudios = (req: FastifyRequest, reply: FastifyReply) => {
-  reply.send(studios);
+export const getStudios = async (req: FastifyRequest, reply: FastifyReply) => {
+  const studiosFromDatabase = await prisma.studio.findMany();
+  reply.send(studiosFromDatabase);
 };
 
 export const getStudio = (req: ParamsIdRequest, reply: FastifyReply) => {
   const id = Number(req.params.id);
   const studio = studios.find((studio) => studio.id === id);
-
+  console.log(studio);
   reply.send(studio);
 };
 
