@@ -1,7 +1,13 @@
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+// import { PrismaClient } from '@prisma/client';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
+import { artistRoutes } from './routes/artists.js';
+// import { main } from './prisma/seed.js';
 import { studioRoutes } from './routes/studios.js';
+
+// const prisma = new PrismaClient();
+// main();
 
 const fastify = Fastify({
   logger: true,
@@ -40,9 +46,11 @@ fastify.register(fastifySwaggerUi),
       },
     },
     // staticCSP: true,
-    // transformStaticCSP: (header:) => header,
-    // transformSpecification: (swaggerObject, request, reply) => { return swaggerObject },
-    // transformSpecificationClone: true
+    // transformStaticCSP: (header) => header,
+    // transformSpecification: (swaggerObject, request, reply) => {
+    //   return swaggerObject;
+    // },
+    // transformSpecificationClone: true,
   };
 
 fastify.get('/', async () => {
@@ -50,6 +58,7 @@ fastify.get('/', async () => {
 });
 
 fastify.register(studioRoutes);
+fastify.register(artistRoutes);
 
 /**
  * Run the server!
