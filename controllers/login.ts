@@ -31,21 +31,24 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
   );
 
   if (!isPasswordValid) {
-    reply.code(403).send({ message: 'username or password not valid' });
+    return reply.code(403).send({ message: 'username or password not valid' });
   }
+
+  const token = crypto.randomBytes(100).toString('base64');
+
+  console.log(token);
+
+  const session = await prisma.session.create({
+    data: {
+      userId: userWithPassword.id,
+      token,
+    },
+  });
+
+  console.log(session);
+  if (!session) {
+    reply.code(401).send({});
+    return JSON.stringify({ message: 'Error creating the new session' });
+  }
+  reply.send('Login successfull');
 };
-
-const token = crypto.randomBytes(100).toString('base64');
-
-//   // 5. Create the session record
-
-// const session = await createSession(userWithPassword.id, token);
-
-//   if (!session) {
-//     return NextResponse.json(
-//       { errors: [{ message: 'Error creating the new session' }] },
-//       {
-//         status: 401,
-//       },
-//     );
-//   }
