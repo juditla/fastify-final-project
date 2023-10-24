@@ -42,6 +42,7 @@ export const artists: Artist[] = [
     studioId: 3,
     name: 'schmoozyTattoozy',
     description: 'i do them schmooziest tattoosies',
+    userId: 1,
   },
   {
     id: 2,
@@ -49,6 +50,7 @@ export const artists: Artist[] = [
     studioId: 2,
     name: 'inksi',
     description: 'i do them inksies with the pinksies',
+    userId: 2,
   },
   {
     id: 3,
@@ -56,6 +58,7 @@ export const artists: Artist[] = [
     studioId: 1,
     name: 'thetatooer',
     description: 'i do tattoop',
+    userId: 3,
   },
   {
     id: 4,
@@ -63,6 +66,7 @@ export const artists: Artist[] = [
     studioId: 4,
     name: 'huho',
     description: 'i do them tatthuho',
+    userId: 4,
   },
 ];
 
