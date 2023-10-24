@@ -1,6 +1,9 @@
+import { Prisma, PrismaClient } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { artists } from '../data.js';
 import { ParamsIdRequest } from '../types.js';
+
+const prisma = new PrismaClient();
 
 type AddArtistRequest = FastifyRequest<{
   Body: {
@@ -24,8 +27,14 @@ type UpdateArtistRequest = FastifyRequest<{
   };
 }>;
 
-export const getArtists = (req: FastifyRequest, reply: FastifyReply) => {
-  reply.send(artists);
+export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
+  const artistsFromDatabase = await prisma.artist.findMany({
+    include: {
+      studio: true,
+      tattooImages: true,
+    },
+  });
+  reply.send(artistsFromDatabase);
 };
 
 export const getArtist = (req: ParamsIdRequest, reply: FastifyReply) => {
@@ -53,9 +62,9 @@ export const deleteArtist = (req: ParamsIdRequest, reply: FastifyReply) => {
   const id = Number(req.params.id);
   const artist = artists.find((artist) => artist.id === id);
   if (artist) {
-    reply.send({ message: `Studio ${artist.name} has been deleted` });
+    reply.code(200).send({ message: `Studio ${artist.name} has been deleted` });
   } else {
-    reply.send({
+    reply.code(400).send({
       message: `An error occured while deleting the studio. The studio could not be found, please try again`,
     });
   }
