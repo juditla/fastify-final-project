@@ -23,6 +23,7 @@ const Artist = {
 // Options for get all studios
 const getArtistsOpts = {
   schema: {
+    tags: ['artists'],
     response: {
       200: {
         type: 'array',
@@ -35,6 +36,7 @@ const getArtistsOpts = {
 
 const getArtistOpts = {
   schema: {
+    tags: ['artists'],
     response: {
       200: Artist,
     },
@@ -44,6 +46,7 @@ const getArtistOpts = {
 
 const postArtistOpts = {
   schema: {
+    tags: ['artists'],
     body: {
       type: 'object',
       required: ['name', 'style', 'studioId', 'userId', 'description'],
@@ -65,6 +68,7 @@ const postArtistOpts = {
 
 const deleteArtistOpts = {
   schema: {
+    tags: ['artists'],
     response: {
       200: {
         type: 'object',
@@ -79,6 +83,7 @@ const deleteArtistOpts = {
 
 const updateArtistOpts = {
   schema: {
+    tags: ['artists'],
     response: {
       200: Artist,
     },

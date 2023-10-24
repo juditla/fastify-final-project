@@ -25,6 +25,7 @@ const Studio = {
 // Options for get all studios
 const getStudiosOpts = {
   schema: {
+    tags: ['studios'],
     response: {
       200: {
         type: 'array',
@@ -37,6 +38,7 @@ const getStudiosOpts = {
 
 const getStudioOpts = {
   schema: {
+    tags: ['studios'],
     response: {
       200: Studio,
     },
@@ -46,6 +48,7 @@ const getStudioOpts = {
 
 const postStudioOpts = {
   schema: {
+    tags: ['studios'],
     body: {
       type: 'object',
       required: ['name', 'address', 'city', 'postalCode', 'ownerId'],
@@ -69,6 +72,7 @@ const postStudioOpts = {
 
 const deleteStudioOpts = {
   schema: {
+    tags: ['studios'],
     response: {
       200: {
         type: 'object',
@@ -83,6 +87,7 @@ const deleteStudioOpts = {
 
 const updateStudioOpts = {
   schema: {
+    tags: ['studios'],
     response: {
       200: Studio,
     },
