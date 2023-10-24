@@ -64,19 +64,27 @@ export const getUserByEmail = async (
 export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
   const { email, firstName, lastName, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 12);
-  const newUser = await prisma.user.create({
-    data: {
-      email,
-      firstName,
-      lastName,
-      password: hashedPassword,
-    },
-  });
 
-  // errorhandling!!
-
-  reply.code(201).send(newUser);
+  try {
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        firstName,
+        lastName,
+        password: hashedPassword,
+      },
+    });
+    console.log('newUser', newUser);
+    reply.code(201).send(newUser);
+  } catch (error) {
+    console.log('error', error);
+    reply
+      .code(500)
+      .send({ message: 'User with this email address already exists' });
+    // oder vorher checken ob es den user schon gibt?
+  }
 };
+
 export const deleteUserByEmail = async (
   req: DeleteUserByEmail,
   reply: FastifyReply,
