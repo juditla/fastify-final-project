@@ -5,26 +5,25 @@ import { ParamsIdRequest } from '../types.js';
 
 const prisma = new PrismaClient();
 
+type Artist = {
+  // id: number;
+  style: string;
+  studioId?: number;
+  userId: number;
+  name: string;
+  description: string;
+  token: string;
+};
+
+type ArtistNoId = Omit<Artist, 'id'>;
+
 type AddArtistRequest = FastifyRequest<{
-  Body: {
-    id: number;
-    style: string;
-    studioId: number;
-    userId: number;
-    name: string;
-    description: string;
-  };
+  Body: Artist;
 }>;
 
 type UpdateArtistRequest = FastifyRequest<{
   Params: { id: string };
-  Body: {
-    style: string;
-    studioId: number;
-    userId: number;
-    name: string;
-    description: string;
-  };
+  Body: Artist;
 }>;
 
 export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -37,27 +36,52 @@ export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
   reply.send(artistsFromDatabase);
 };
 
-export const getArtist = (req: ParamsIdRequest, reply: FastifyReply) => {
+export const getArtist = async (req: ParamsIdRequest, reply: FastifyReply) => {
   const id = Number(req.params.id);
-  const artist = artists.find((artist) => artist.id === id);
-  console.log(artist);
+  const artist = await prisma.artist.findUnique({
+    where: {
+      id,
+    },
+  });
   reply.send(artist);
 };
 
-export const addArtist = (req: AddArtistRequest, reply: FastifyReply) => {
-  const { name, style, studioId, userId, description } = req.body;
-  const artist = {
-    name,
-    style,
-    studioId,
-    userId,
-    description,
-  };
+export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
+  const { name, style, description, token } = req.body;
 
-  // code der das Studio dann wirklich in die database speichert!
-
-  reply.code(201).send(artist);
+  const now = new Date();
+  const validSessionFromDatabase = await prisma.session.findUnique({
+    where: {
+      token,
+      expiryTimestamp: {
+        gt: now,
+      },
+    },
+  });
+  if (!validSessionFromDatabase) {
+    reply.code(400).send({ message: 'Invalid session' });
+  } else {
+    try {
+      const newArtist = await prisma.artist.create({
+        data: {
+          name,
+          style,
+          userId: validSessionFromDatabase.userId,
+          description,
+          // studioId: 0,
+        },
+      });
+      reply.code(201).send(newArtist);
+      if (!newArtist) {
+        reply.code(406).send({ message: 'error creating new artist' });
+      }
+    } catch (error) {
+      console.log(error);
+      reply.code(500).send({ message: 'error' });
+    }
+  }
 };
+
 export const deleteArtist = (req: ParamsIdRequest, reply: FastifyReply) => {
   const id = Number(req.params.id);
   const artist = artists.find((artist) => artist.id === id);
