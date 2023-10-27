@@ -16,8 +16,9 @@ const UserWithPassword = {
     firstName: { type: 'string' },
     lastName: { type: 'string' },
     password: { type: 'string' },
+    roleId: { type: 'number' },
   },
-};
+} as const;
 
 // User without password schema
 const UserWithoutPassword = {
@@ -27,10 +28,11 @@ const UserWithoutPassword = {
     email: { type: 'string' },
     firstName: { type: 'string' },
     lastName: { type: 'string' },
+    roleId: { type: 'number' },
   },
 };
 
-const getUsersOpts = {
+const getUsersSchema = {
   schema: {
     tags: ['users'],
     response: {
@@ -40,8 +42,7 @@ const getUsersOpts = {
       },
     },
   },
-  handler: getUsers,
-};
+} as const;
 
 const getUserOpts = {
   schema: {
@@ -59,11 +60,12 @@ const postUserOpts = {
     body: {
       required: ['email', 'firstName', 'lastName', 'password'],
       properties: {
-        id: { type: 'number' },
+        // id: { type: 'number' },
         email: { type: 'string' },
         firstName: { type: 'string' },
         lastName: { type: 'string' },
         password: { type: 'string' },
+        roleId: { type: 'number' },
       },
     },
     response: {
@@ -104,7 +106,7 @@ export function userRoutes(
   done: (err?: FastifyError) => void, // in types.ts im root dir alle tyoes die ich öfter brauche definieren und exportieren
 ) {
   // Get all studios
-  fastify.get('/users', getUsersOpts);
+  fastify.get('/users', getUsersSchema, getUsers);
 
   // Get single user by id
   fastify.get('/users/:id', getUserOpts);

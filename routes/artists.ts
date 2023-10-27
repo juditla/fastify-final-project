@@ -49,14 +49,15 @@ const postArtistOpts = {
     tags: ['artists'],
     body: {
       type: 'object',
-      required: ['name', 'style', 'studioId', 'userId', 'description'],
+      required: ['name', 'style', 'token', 'description'],
       properties: {
         name: { type: 'string' },
-        id: { type: 'number' }, // brauch ich das hier???
+        // id: { type: 'number' }, // brauch ich das hier???
         descritption: { type: 'string' },
         userId: { type: 'number' },
         studioId: { type: 'number' },
         style: { type: 'string' },
+        token: { type: 'string' },
       },
     },
     response: {

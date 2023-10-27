@@ -13,11 +13,15 @@ const loginOpts = {
         password: { type: 'string' },
       },
     },
-    response: {
-      201: {
-        // was kommt zurück?
-      },
-    },
+    // response: {
+    //   201: {
+    //     type: 'object',
+    //     properties: {
+    //       message: { type: 'string' },
+    //       token: { type: 'string' },
+    //     },
+    //   },
+    // },
   },
   handler: loginHandler,
 };
