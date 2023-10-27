@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
@@ -65,61 +66,80 @@ export const getUserByEmail = async (
   reply.send(userFromDatabase);
 };
 
+const newUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(60).max(60),
+  firstName: z.string().min(3),
+  lastName: z.string().min(3),
+  roleId: z.number().min(1).max(3),
+});
+
 export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
   const { email, firstName, lastName, password, roleId } = req.body;
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  // check if username already in use
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (user) {
-      reply
-        .code(500)
-        .send({ message: 'User with this email address already exists' });
+  const validatedNewUser = newUserSchema.safeParse({
+    email,
+    hashedPassword,
+    firstName,
+    lastName,
+    roleId,
+  });
+  if (!validatedNewUser) {
+    console.log('Input validation failed');
+  } else {
+    // check if username already in use
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+      if (user) {
+        reply
+          .code(500)
+          .send({ message: 'User with this email address already exists' });
+      }
+    } catch (error) {
+      console.log('error', error);
     }
-  } catch (error) {
-    console.log('error', error);
-  }
-  // create new user in database
-  try {
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        firstName,
-        lastName,
-        password: hashedPassword,
-        roleId,
-      },
-    });
+    // create new user in database
+    try {
+      const newUser = await prisma.user.create({
+        data: {
+          email,
+          firstName,
+          lastName,
+          password: hashedPassword,
+          roleId,
+        },
+      });
 
-    if (!newUser) {
-      reply.code(406).send({ message: 'error creating new user' });
+      if (!newUser) {
+        reply.code(406).send({ message: 'error creating new user' });
+      }
+
+      // create token
+      const token = crypto.randomBytes(100).toString('base64');
+
+      // Create session in database
+      const session = await prisma.session.create({
+        data: {
+          userId: newUser.id,
+          token,
+        },
+      });
+
+      if (!session) {
+        return reply
+          .code(401)
+          .send({ message: 'Error creating the new session' });
+      }
+
+      reply.code(201).send(newUser);
+    } catch (error) {
+      console.log('error', error);
     }
-
-    // create token
-    const token = crypto.randomBytes(100).toString('base64');
-
-    // Create session in database
-    const session = await prisma.session.create({
-      data: {
-        userId: newUser.id,
-        token,
-      },
-    });
-
-    if (!session) {
-      return reply
-        .code(401)
-        .send({ message: 'Error creating the new session' });
-    }
-
-    reply.code(201).send(newUser);
-  } catch (error) {
-    console.log('error', error);
   }
 };
 

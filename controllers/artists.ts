@@ -1,6 +1,6 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { artists } from '../data.js';
+import { z } from 'zod';
 import { ParamsIdRequest } from '../types.js';
 
 const prisma = new PrismaClient();
@@ -46,6 +46,12 @@ export const getArtist = async (req: ParamsIdRequest, reply: FastifyReply) => {
   reply.send(artist);
 };
 
+const artistSchema = z.object({
+  name: z.string().min(3),
+  style: z.string().min(3),
+  description: z.string().min(10),
+});
+
 export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
   const { name, style, description, token } = req.body;
   // check if session is valid
@@ -61,24 +67,33 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
   if (!validSessionFromDatabase) {
     reply.code(400).send({ message: 'Invalid session' });
   } else {
-    // if valid session then create artist, get the userid from the valid session
-    try {
-      const newArtist = await prisma.artist.create({
-        data: {
-          name,
-          style,
-          userId: validSessionFromDatabase.userId,
-          description,
-          // studioId: 0,
-        },
-      });
-      reply.code(201).send(newArtist);
-      if (!newArtist) {
-        reply.code(406).send({ message: 'error creating new artist' });
+    // if valid session then validate input then create artist, get the userid from the valid session
+    const validatedNewArtist = artistSchema.safeParse({
+      name,
+      style,
+      description,
+    });
+    if (!validatedNewArtist.success) {
+      console.log(validatedNewArtist);
+    } else {
+      try {
+        const newArtist = await prisma.artist.create({
+          data: {
+            name,
+            style,
+            userId: validSessionFromDatabase.userId,
+            description,
+            // studioId: 0,
+          },
+        });
+        reply.code(201).send(newArtist);
+        if (!newArtist) {
+          reply.code(406).send({ message: 'error creating new artist' });
+        }
+      } catch (error) {
+        console.log(error);
+        reply.code(500).send({ message: 'error' });
       }
-    } catch (error) {
-      console.log(error);
-      reply.code(500).send({ message: 'error' });
     }
   }
 };
