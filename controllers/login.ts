@@ -36,8 +36,6 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
 
   const token = crypto.randomBytes(100).toString('base64');
 
-  console.log(token);
-
   const session = await prisma.session.create({
     data: {
       userId: userWithPassword.id,
@@ -45,10 +43,10 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
     },
   });
 
-  console.log(session);
   if (!session) {
     reply.code(401).send({});
     return JSON.stringify({ message: 'Error creating the new session' });
   }
-  reply.send('Login successfull');
+
+  reply.send({ token: session.token, expiresAt: session.expiryTimestamp });
 };
