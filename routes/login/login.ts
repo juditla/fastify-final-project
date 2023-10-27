@@ -1,8 +1,8 @@
 import { FastifyError } from 'fastify';
 import { FastifyInstance } from 'fastify/types/instance.js';
 import { FastifySchema } from 'fastify/types/schema.js';
-import { loginHandler } from '../controllers/login.js';
-import { loginOpts } from './schema/login.js';
+import { loginHandler } from '../../controllers/login.js';
+import { loginOpts } from './loginOpts.js';
 
 export function loginRoutes(
   fastify: FastifyInstance,

@@ -5,14 +5,14 @@ import {
   getArtist,
   getArtists,
   updateArtist,
-} from '../controllers/artists.js';
+} from '../../controllers/artists.js';
 import {
   deleteArtistOpts,
   getArtistOpts,
   getArtistsOpts,
   postArtistOpts,
   updateArtistOpts,
-} from './schema/artists.js';
+} from './artistsOpts.js';
 
 export function artistRoutes(
   fastify: FastifyInstance,

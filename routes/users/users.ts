@@ -5,13 +5,13 @@ import {
   getUserByEmail,
   getUsers,
   updateUser,
-} from '../controllers/users.js';
+} from '../../controllers/users.js';
 import {
   deleteUserOpts,
   getUserOpts,
   postUserOpts,
   updateUserOpts,
-} from './schema/users.js';
+} from './usersOpts.js';
 
 export function userRoutes(
   fastify: FastifyInstance,

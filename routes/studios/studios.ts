@@ -5,13 +5,13 @@ import {
   getStudio,
   getStudios,
   updateStudio,
-} from '../controllers/studios.js';
+} from '../../controllers/studios.js';
 import {
   deleteStudioOpts,
   getStudiosOpts,
   postStudioOpts,
   updateStudioOpts,
-} from './schema/studios.js';
+} from './studiosOpts.js';
 
 export function studioRoutes(
   fastify: FastifyInstance,

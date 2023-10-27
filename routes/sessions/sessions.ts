@@ -2,8 +2,8 @@ import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
   deleteSessionByToken,
   validateSession,
-} from '../controllers/sessions.js';
-import { deleteSessionOpts, postSessionOpts } from './schema/sessions.js';
+} from '../../controllers/sessions.js';
+import { deleteSessionOpts, postSessionOpts } from './sessionsOpts.js';
 
 export function sessionRoutes(
   fastify: FastifyInstance,
