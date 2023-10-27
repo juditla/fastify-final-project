@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -6,11 +7,12 @@ const prisma = new PrismaClient();
 
 type AddUserRequest = FastifyRequest<{
   Body: {
-    id: number;
+    // id: number;
     email: string;
     firstName: string;
     lastName: string;
     password: string;
+    roleId?: number;
   };
 }>;
 
@@ -55,16 +57,32 @@ export const getUserByEmail = async (
     },
   });
   if (!userFromDatabase) {
-    // errorhandling!!
+    reply.code(400).send({ message: 'User could not be found' });
   }
   console.log(userFromDatabase);
   reply.send(userFromDatabase);
 };
 
 export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
-  const { email, firstName, lastName, password } = req.body;
+  const { email, firstName, lastName, password, roleId } = req.body;
   const hashedPassword = await bcrypt.hash(password, 12);
+  // hier abfragen ob es user schon gibt und dann 500er code zur¨ckgeben
 
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (user) {
+      reply
+        .code(500)
+        .send({ message: 'User with this email address already exists' });
+    }
+  } catch (error) {
+    console.log('error', error);
+  }
+  // dann newUser createn und wenn das nicht funktioniert 406 zurück
   try {
     const newUser = await prisma.user.create({
       data: {
@@ -72,15 +90,39 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
         firstName,
         lastName,
         password: hashedPassword,
+        roleId,
       },
     });
-    console.log('newUser', newUser);
+
+    if (!newUser) {
+      reply.code(406).send({ message: 'error creating new user' });
+    }
+
+    const token = crypto.randomBytes(100).toString('base64');
+
+    // 5. Create the session record
+    const session = await prisma.session.create({
+      data: {
+        userId: newUser.id,
+        token,
+      },
+    });
+
+    if (!session) {
+      return reply
+        .code(401)
+        .send({ message: 'Error creating the new session' });
+    }
+    // cookies.set('token', token, {
+    //   expires: 7, // 7 days
+    //   path: '/',
+    //   //,secure: true // If served over HTTPS
+    // });
+
     reply.code(201).send(newUser);
   } catch (error) {
     console.log('error', error);
-    reply
-      .code(500)
-      .send({ message: 'User with this email address already exists' });
+
     // oder vorher checken ob es den user schon gibt?
   }
 };
