@@ -36,10 +36,14 @@ export const getStudios = async (req: FastifyRequest, reply: FastifyReply) => {
   reply.send(studiosFromDatabase);
 };
 
-export const getStudio = (req: ParamsIdRequest, reply: FastifyReply) => {
+export const getStudio = async (req: ParamsIdRequest, reply: FastifyReply) => {
   const id = Number(req.params.id);
-  const studio = studios.find((studio) => studio.id === id);
-  console.log(studio);
+  const studio = await prisma.studio.findUnique({
+    where: {
+      id,
+    },
+  });
+
   reply.send(studio);
 };
 
