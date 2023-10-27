@@ -4,6 +4,7 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { artistRoutes } from './routes/artists.js';
 import { loginRoutes } from './routes/login.js';
+import { sessionRoutes } from './routes/sessions.js';
 // import { main } from './prisma/seed.js';
 import { studioRoutes } from './routes/studios.js';
 import { userRoutes } from './routes/users.js';
@@ -63,6 +64,7 @@ fastify.register(studioRoutes);
 fastify.register(artistRoutes);
 fastify.register(userRoutes);
 fastify.register(loginRoutes);
+fastify.register(sessionRoutes);
 
 /**
  * Run the server!
