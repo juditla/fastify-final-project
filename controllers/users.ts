@@ -33,6 +33,7 @@ type DeleteUserByEmail = FastifyRequest<{
   Body: { email: string };
 }>;
 
+// where do I need all users?
 export const getUsers = async (req: FastifyRequest, reply: FastifyReply) => {
   const usersFromDatabase = await prisma.user.findMany({
     include: {
@@ -46,6 +47,7 @@ export const getUsers = async (req: FastifyRequest, reply: FastifyReply) => {
   reply.send(usersFromDatabase);
 };
 
+// rethink this function, do I need it? call prisma.user.findUnique in login already & bei addUser to check for existing user email
 export const getUserByEmail = async (
   req: GetUserByEmail,
   reply: FastifyReply,
@@ -66,8 +68,8 @@ export const getUserByEmail = async (
 export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
   const { email, firstName, lastName, password, roleId } = req.body;
   const hashedPassword = await bcrypt.hash(password, 12);
-  // hier abfragen ob es user schon gibt und dann 500er code zur¨ckgeben
 
+  // check if username already in use
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -82,7 +84,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
   } catch (error) {
     console.log('error', error);
   }
-  // dann newUser createn und wenn das nicht funktioniert 406 zurück
+  // create new user in database
   try {
     const newUser = await prisma.user.create({
       data: {
@@ -98,9 +100,10 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
       reply.code(406).send({ message: 'error creating new user' });
     }
 
+    // create token
     const token = crypto.randomBytes(100).toString('base64');
 
-    // 5. Create the session record
+    // Create session in database
     const session = await prisma.session.create({
       data: {
         userId: newUser.id,
@@ -113,19 +116,14 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
         .code(401)
         .send({ message: 'Error creating the new session' });
     }
-    // cookies.set('token', token, {
-    //   expires: 7, // 7 days
-    //   path: '/',
-    //   //,secure: true // If served over HTTPS
-    // });
 
     reply.code(201).send(newUser);
   } catch (error) {
     console.log('error', error);
-
-    // oder vorher checken ob es den user schon gibt?
   }
 };
+
+// works till here, code below not yet in use
 
 export const deleteUserByEmail = async (
   req: DeleteUserByEmail,

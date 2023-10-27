@@ -6,94 +6,12 @@ import {
   getStudios,
   updateStudio,
 } from '../controllers/studios.js';
-
-// Studio schema
-const Studio = {
-  type: 'object',
-  properties: {
-    id: { type: 'number' },
-    name: { type: 'string' },
-    address: { type: 'string' },
-    city: { type: 'string' },
-    postalCode: { type: 'number' },
-    ownerId: { type: 'number' },
-    longitude: { type: 'string' },
-    latitude: { type: 'string' },
-  },
-};
-
-// Options for get all studios
-const getStudiosOpts = {
-  schema: {
-    tags: ['studios'],
-    response: {
-      200: {
-        type: 'array',
-        studios: Studio,
-      },
-    },
-  },
-  handler: getStudios,
-};
-
-const getStudioOpts = {
-  schema: {
-    tags: ['studios'],
-    response: {
-      200: Studio,
-    },
-  },
-  handler: getStudio,
-};
-
-const postStudioOpts = {
-  schema: {
-    tags: ['studios'],
-    body: {
-      type: 'object',
-      required: ['name', 'address', 'city', 'postalCode', 'ownerId'],
-      properties: {
-        name: { type: 'string' },
-        id: { type: 'number' }, // brauch ich das hier???
-        address: { type: 'string' },
-        city: { type: 'string' },
-        postalCode: { type: 'number' },
-        ownerId: { type: 'number' },
-        longitude: { type: 'string' },
-        latitude: { type: 'string' },
-      },
-    },
-    response: {
-      201: Studio,
-    },
-  },
-  handler: addStudio,
-};
-
-const deleteStudioOpts = {
-  schema: {
-    tags: ['studios'],
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' },
-        },
-      },
-    },
-  },
-  handler: deleteStudio,
-};
-
-const updateStudioOpts = {
-  schema: {
-    tags: ['studios'],
-    response: {
-      200: Studio,
-    },
-  },
-  handler: updateStudio,
-};
+import {
+  deleteStudioOpts,
+  getStudiosOpts,
+  postStudioOpts,
+  updateStudioOpts,
+} from './schema/studios.js';
 
 export function studioRoutes(
   fastify: FastifyInstance,
@@ -101,19 +19,19 @@ export function studioRoutes(
   done: (err?: FastifyError) => void, // in types.ts im root dir alle tyoes die ich öfter brauche definieren und exportieren
 ) {
   // Get all studios
-  fastify.get('/studios', getStudiosOpts);
+  fastify.get('/studios', getStudiosOpts, getStudios);
 
   // Get single studio
-  fastify.get('/studios/:id', getStudioOpts);
+  fastify.get('/studios/:id', getStudiosOpts, getStudio);
 
   // Add studio
-  fastify.post('/studios', postStudioOpts);
+  fastify.post('/studios', postStudioOpts, addStudio);
 
   // Delete studio
-  fastify.delete('/studios/:id', deleteStudioOpts);
+  fastify.delete('/studios/:id', deleteStudioOpts, deleteStudio);
 
   // Update studio
-  fastify.put('/studios/:id', updateStudioOpts);
+  fastify.put('/studios/:id', updateStudioOpts, updateStudio);
 
   done();
 }

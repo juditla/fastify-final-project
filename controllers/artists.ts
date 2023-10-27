@@ -48,7 +48,7 @@ export const getArtist = async (req: ParamsIdRequest, reply: FastifyReply) => {
 
 export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
   const { name, style, description, token } = req.body;
-
+  // check if session is valid
   const now = new Date();
   const validSessionFromDatabase = await prisma.session.findUnique({
     where: {
@@ -61,6 +61,7 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
   if (!validSessionFromDatabase) {
     reply.code(400).send({ message: 'Invalid session' });
   } else {
+    // if valid session then create artist, get the userid from the valid session
     try {
       const newArtist = await prisma.artist.create({
         data: {
@@ -82,9 +83,16 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
   }
 };
 
-export const deleteArtist = (req: ParamsIdRequest, reply: FastifyReply) => {
+export const deleteArtist = async (
+  req: ParamsIdRequest,
+  reply: FastifyReply,
+) => {
   const id = Number(req.params.id);
-  const artist = artists.find((artist) => artist.id === id);
+  const artist = await prisma.artist.delete({
+    where: {
+      id,
+    },
+  });
   if (artist) {
     reply.code(200).send({ message: `Studio ${artist.name} has been deleted` });
   } else {
@@ -94,7 +102,11 @@ export const deleteArtist = (req: ParamsIdRequest, reply: FastifyReply) => {
   }
 };
 
-export const updateArtist = (req: UpdateArtistRequest, reply: FastifyReply) => {
+export const updateArtist = async (
+  req: UpdateArtistRequest,
+  reply: FastifyReply,
+) => {
+  // here still necessary to define how changing an artists will look like
   const { id } = req.params;
   const { name, style, studioId, userId, description } = req.body;
 

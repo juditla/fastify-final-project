@@ -6,111 +6,34 @@ import {
   getArtists,
   updateArtist,
 } from '../controllers/artists.js';
-
-// Studio schema
-const Artist = {
-  type: 'object',
-  properties: {
-    name: { type: 'string' },
-    id: { type: 'number' }, // brauch ich das hier???
-    descritption: { type: 'string' },
-    userId: { type: 'number' },
-    studioId: { type: 'number' },
-    style: { type: 'string' },
-  },
-};
-
-// Options for get all studios
-const getArtistsOpts = {
-  schema: {
-    tags: ['artists'],
-    response: {
-      200: {
-        type: 'array',
-        studios: Artist,
-      },
-    },
-  },
-  handler: getArtists,
-};
-
-const getArtistOpts = {
-  schema: {
-    tags: ['artists'],
-    response: {
-      200: Artist,
-    },
-  },
-  handler: getArtist,
-};
-
-const postArtistOpts = {
-  schema: {
-    tags: ['artists'],
-    body: {
-      type: 'object',
-      required: ['name', 'style', 'token', 'description'],
-      properties: {
-        name: { type: 'string' },
-        // id: { type: 'number' }, // brauch ich das hier???
-        descritption: { type: 'string' },
-        userId: { type: 'number' },
-        studioId: { type: 'number' },
-        style: { type: 'string' },
-        token: { type: 'string' },
-      },
-    },
-    response: {
-      201: Artist,
-    },
-  },
-  handler: addArtist,
-};
-
-const deleteArtistOpts = {
-  schema: {
-    tags: ['artists'],
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' },
-        },
-      },
-    },
-  },
-  handler: deleteArtist,
-};
-
-const updateArtistOpts = {
-  schema: {
-    tags: ['artists'],
-    response: {
-      200: Artist,
-    },
-  },
-  handler: updateArtist,
-};
+import {
+  deleteArtistOpts,
+  getArtistOpts,
+  getArtistsOpts,
+  postArtistOpts,
+  updateArtistOpts,
+} from './schema/artists.js';
 
 export function artistRoutes(
   fastify: FastifyInstance,
   options: FastifySchema,
-  done: (err?: FastifyError) => void, // in types.ts im root dir alle tyoes die ich öfter brauche definieren und exportieren
+  done: (err?: FastifyError) => void,
 ) {
-  // Get all studios
-  fastify.get('/artists', getArtistsOpts);
+  // schema defines how request body should look like, required fields, how standard response is defined, tags for swagger (ui)
+  // Get all artists
+  fastify.get('/artists', getArtistsOpts, getArtists);
 
-  // Get single studio
-  fastify.get('/artists/:id', getArtistOpts);
+  // Get single artist
+  fastify.get('/artists/:id', getArtistOpts, getArtist);
 
-  // Add studio
-  fastify.post('/artists', postArtistOpts);
+  // Add artist
+  fastify.post('/artists', postArtistOpts, addArtist);
 
-  // Delete studio
-  fastify.delete('/artists/:id', deleteArtistOpts);
+  // Delete artist
+  fastify.delete('/artists/:id', deleteArtistOpts, deleteArtist);
 
-  // Update studio
-  fastify.put('/artists/:id', updateArtistOpts);
+  // Update artist
+  fastify.put('/artists/:id', updateArtistOpts, updateArtist);
 
   done();
 }

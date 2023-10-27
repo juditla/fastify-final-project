@@ -6,119 +6,32 @@ import {
   getUsers,
   updateUser,
 } from '../controllers/users.js';
-
-// User schema
-const UserWithPassword = {
-  type: 'object',
-  properties: {
-    id: { type: 'number' },
-    email: { type: 'string' },
-    firstName: { type: 'string' },
-    lastName: { type: 'string' },
-    password: { type: 'string' },
-    roleId: { type: 'number' },
-  },
-} as const;
-
-// User without password schema
-const UserWithoutPassword = {
-  type: 'object',
-  properties: {
-    id: { type: 'number' },
-    email: { type: 'string' },
-    firstName: { type: 'string' },
-    lastName: { type: 'string' },
-    roleId: { type: 'number' },
-  },
-};
-
-const getUsersSchema = {
-  schema: {
-    tags: ['users'],
-    response: {
-      200: {
-        type: 'array',
-        studios: UserWithoutPassword,
-      },
-    },
-  },
-} as const;
-
-const getUserOpts = {
-  schema: {
-    tags: ['users'],
-    response: {
-      200: UserWithPassword,
-    },
-  },
-  handler: getUserByEmail,
-};
-
-const postUserOpts = {
-  schema: {
-    tags: ['users'],
-    body: {
-      required: ['email', 'firstName', 'lastName', 'password'],
-      properties: {
-        // id: { type: 'number' },
-        email: { type: 'string' },
-        firstName: { type: 'string' },
-        lastName: { type: 'string' },
-        password: { type: 'string' },
-        roleId: { type: 'number' },
-      },
-    },
-    response: {
-      201: UserWithoutPassword,
-    },
-  },
-  handler: addUser,
-};
-
-const deleteUserOpts = {
-  schema: {
-    tags: ['users'],
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' },
-        },
-      },
-    },
-  },
-  handler: deleteUserByEmail,
-};
-
-const updateUserOpts = {
-  schema: {
-    tags: ['users'],
-    response: {
-      200: UserWithoutPassword,
-    },
-  },
-  handler: updateUser,
-};
+import {
+  deleteUserOpts,
+  getUserOpts,
+  postUserOpts,
+  updateUserOpts,
+} from './schema/users.js';
 
 export function userRoutes(
   fastify: FastifyInstance,
   options: FastifySchema,
-  done: (err?: FastifyError) => void, // in types.ts im root dir alle tyoes die ich öfter brauche definieren und exportieren
+  done: (err?: FastifyError) => void,
 ) {
   // Get all studios
-  fastify.get('/users', getUsersSchema, getUsers);
+  fastify.get('/users', getUserOpts, getUsers);
 
   // Get single user by id
-  fastify.get('/users/:id', getUserOpts);
+  fastify.get('/users/:email', getUserOpts, getUserByEmail);
 
   // Create user
-  fastify.post('/users', postUserOpts);
+  fastify.post('/users', postUserOpts, addUser);
 
   // Delete user
-  fastify.delete('/users/:id', deleteUserOpts);
+  fastify.delete('/users/:id', deleteUserOpts, deleteUserByEmail);
 
   // Update user
-  fastify.put('/users/:id', updateUserOpts);
+  fastify.put('/users/:id', updateUserOpts, updateUser);
 
   done();
 }

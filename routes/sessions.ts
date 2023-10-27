@@ -1,24 +1,22 @@
 import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
-import { validateSession } from '../controllers/sessions.js';
+import {
+  deleteSessionByToken,
+  validateSession,
+} from '../controllers/sessions.js';
+import { deleteSessionOpts, postSessionOpts } from './schema/sessions.js';
 
-const postSessionOpts = {
-  schema: {
-    tags: ['session'],
-    body: {
-      required: ['token'],
-      properties: {
-        token: { type: 'string' },
-      },
-    },
-  },
-};
 export function sessionRoutes(
   fastify: FastifyInstance,
   options: FastifySchema,
-  done: (err?: FastifyError) => void, // in types.ts im root dir alle tyoes die ich öfter brauche definieren und exportieren
+  done: (err?: FastifyError) => void,
 ) {
+  // Think about routes path for delete, should be /:token?
+
   // Get valid session by token
   fastify.post('/sessions', postSessionOpts, validateSession);
+
+  // Delete invalid session
+  fastify.delete('/sessions', deleteSessionOpts, deleteSessionByToken);
 
   done();
 }

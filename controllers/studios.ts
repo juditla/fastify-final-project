@@ -47,6 +47,8 @@ export const getStudio = async (req: ParamsIdRequest, reply: FastifyReply) => {
   reply.send(studio);
 };
 
+// works until here!!!! everything below still needs to be worked on!!!!
+
 export const addStudio = (req: AddStudioRequest, reply: FastifyReply) => {
   const { name, address, city, postalCode, ownerId, longitude, latitude } =
     req.body;
@@ -57,11 +59,11 @@ export const addStudio = (req: AddStudioRequest, reply: FastifyReply) => {
     postalCode,
     ownerId,
   };
-  if (longitude && latitude) {
-    // find out why this is not working
-    // studio.longitude = longitude;
-    // studio.latitude = latitude;
-  }
+  // if (longitude && latitude) {
+  // find out why this is not working
+  // studio.longitude = longitude;
+  // studio.latitude = latitude;
+  // }
 
   // code der das Studio dann wirklich in die database speichert!
 
