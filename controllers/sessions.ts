@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { number, z } from 'zod';
 
 const prisma = new PrismaClient();
 
@@ -15,29 +16,50 @@ type DeleteSession = FastifyRequest<{
   };
 }>;
 
+const tokenSchema = z.string().min(100).max(150);
+
 export const validateSession = async (
   req: ValidateSession,
   reply: FastifyReply,
 ) => {
   // compare expiry date from session, only get from database if timestamp is greater than (gt) now
   const token = req.body.token;
-  const now = new Date();
-  const validSessionFromDatabase = await prisma.session.findUnique({
-    where: {
-      token,
-      expiryTimestamp: {
-        gt: now.toISOString(),
+  console.log(token);
+  const validatedToken = tokenSchema.safeParse(token);
+  if (!validatedToken.success) {
+    console.log(validatedToken.error);
+    reply.code(400).send({ message: 'input validation failed' });
+  } else {
+    const now = new Date();
+    console.log(now.toISOString());
+    const validSessionFromDatabase = await prisma.session.findUnique({
+      where: {
+        token,
+        expiryTimestamp: {
+          gt: now.toISOString(),
+        },
       },
-    },
-  });
-  // calls function that deletes all sessions with expired expiry date
-  deleteInvalidSession();
+    });
+    // calls function that deletes all sessions with expired expiry date
+    deleteInvalidSession();
 
-  // no valid session
-  if (!validSessionFromDatabase) {
-    reply.code(400).send({ message: 'Invalid session' });
+    // no valid session
+    if (!validSessionFromDatabase) {
+      reply.code(400).send({ message: 'Invalid session' });
+    } else {
+      const userFromToken = await prisma.user.findUnique({
+        where: {
+          id: validSessionFromDatabase.userId,
+        },
+        select: {
+          firstName: true,
+          roleId: true,
+          id: true,
+        },
+      });
+      reply.code(200).send(userFromToken);
+    }
   }
-  reply.code(204).send();
 };
 
 // delete all expired sessions
