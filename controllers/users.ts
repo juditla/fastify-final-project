@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { ParamsIdRequest } from 'types.js';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -22,12 +23,8 @@ type UpdateUserRequest = FastifyRequest<{
     email: string;
     firstName: string;
     lastName: string;
-    password: string;
+    password?: string;
   };
-}>;
-
-type GetUserByEmail = FastifyRequest<{
-  Body: { email: string; password: string };
 }>;
 
 type DeleteUserByEmail = FastifyRequest<{
@@ -49,14 +46,15 @@ export const getUsers = async (req: FastifyRequest, reply: FastifyReply) => {
 };
 
 // rethink this function, do I need it? call prisma.user.findUnique in login already & bei addUser to check for existing user email
-export const getUserByEmail = async (
-  req: GetUserByEmail,
+export const getUserById = async (
+  req: ParamsIdRequest,
   reply: FastifyReply,
 ) => {
-  const email = req.body.email;
+  const id = Number(req.params.id);
+  console.log(id);
   const userFromDatabase = await prisma.user.findUnique({
     where: {
-      email,
+      id,
     },
   });
   if (!userFromDatabase) {
@@ -75,9 +73,10 @@ const newUserSchema = z.object({
 });
 
 export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
-  const { email, firstName, lastName, password, roleId } = req.body;
+  const { firstName, lastName, password, roleId } = req.body;
+  const email = req.body.email.toLowerCase();
   const hashedPassword = await bcrypt.hash(password, 12);
-
+  // input validation
   const validatedNewUser = newUserSchema.safeParse({
     email,
     hashedPassword,
@@ -87,6 +86,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
   });
   if (!validatedNewUser) {
     console.log('Input validation failed');
+    reply.code(400).send({ message: 'input validation failed' });
   } else {
     // check if username already in use
     try {
@@ -153,16 +153,21 @@ export const deleteUserByEmail = async (
   const deletedUser = prisma.user.delete({ where: { email } });
 };
 
-export const updateUser = (req: UpdateUserRequest, reply: FastifyReply) => {
-  const { email, lastName, firstName, password } = req.body;
-  const updateUser = {
-    email,
-    firstName,
-    lastName,
-    password,
-  };
+export const updateUser = async (
+  req: UpdateUserRequest,
+  reply: FastifyReply,
+) => {
+  const { email, lastName, firstName } = req.body;
 
-  // code der das Studio dann wirklich in die database updated
+  const updateUser = await prisma.user.update({
+    where: {
+      email,
+    },
+    data: {
+      firstName,
+      lastName,
+    },
+  });
 
   reply.code(201).send(updateUser);
 };
