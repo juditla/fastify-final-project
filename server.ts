@@ -1,16 +1,11 @@
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
-// import { PrismaClient } from '@prisma/client';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
-import { artistRoutes } from './routes/artists.js';
-import { loginRoutes } from './routes/login.js';
-import { sessionRoutes } from './routes/sessions.js';
-// import { main } from './prisma/seed.js';
-import { studioRoutes } from './routes/studios.js';
-import { userRoutes } from './routes/users.js';
-
-// const prisma = new PrismaClient();
-// main();
+import { artistRoutes } from './routes/artists/artists.js';
+import { loginRoutes } from './routes/login/login.js';
+import { sessionRoutes } from './routes/sessions/sessions.js';
+import { studioRoutes } from './routes/studios/studios.js';
+import { userRoutes } from './routes/users/users.js';
 
 const fastify = Fastify({
   logger: true,

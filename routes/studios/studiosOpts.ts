@@ -26,7 +26,7 @@ export const getStudiosOpts = {
   },
 };
 
-const getStudioOpts = {
+export const getStudioOpts = {
   schema: {
     tags: ['studios'],
     response: {

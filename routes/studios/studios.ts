@@ -8,6 +8,7 @@ import {
 } from '../../controllers/studios.js';
 import {
   deleteStudioOpts,
+  getStudioOpts,
   getStudiosOpts,
   postStudioOpts,
   updateStudioOpts,
@@ -22,7 +23,7 @@ export function studioRoutes(
   fastify.get('/studios', getStudiosOpts, getStudios);
 
   // Get single studio
-  fastify.get('/studios/:id', getStudiosOpts, getStudio);
+  fastify.get('/studios/:id', getStudioOpts, getStudio);
 
   // Add studio
   fastify.post('/studios', postStudioOpts, addStudio);
