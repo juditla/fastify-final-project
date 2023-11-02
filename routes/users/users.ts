@@ -2,7 +2,7 @@ import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
   addUser,
   deleteUserByEmail,
-  getUserByEmail,
+  getUserById,
   getUsers,
   updateUser,
 } from '../../controllers/users.js';
@@ -21,8 +21,8 @@ export function userRoutes(
   // Get all studios
   fastify.get('/users', getUserOpts, getUsers);
 
-  // Get single user by id
-  fastify.get('/users/:email', getUserOpts, getUserByEmail);
+  // Get single user by email
+  fastify.get('/users/:id', getUserOpts, getUserById);
 
   // Create user
   fastify.post('/users', postUserOpts, addUser);
