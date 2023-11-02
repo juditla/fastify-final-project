@@ -75,6 +75,7 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
     });
     if (!validatedNewArtist.success) {
       console.log(validatedNewArtist);
+      reply.code(400).send({ message: 'input validation failed' });
     } else {
       try {
         const newArtist = await prisma.artist.create({
