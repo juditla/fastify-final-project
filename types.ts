@@ -19,12 +19,12 @@ export type Artist = {
   id: number;
   style: string;
   studioId: number;
-  userId: number
+  userId: number;
   name: string;
   description: string;
 };
 
-export type tattooImage = {
+export type TattooImage = {
   id: number;
   name: string;
   picture: string;
@@ -35,7 +35,7 @@ export type tattooImage = {
   style: string;
 };
 
-export type studioImage = {
+export type StudioImage = {
   id: number;
   name: string;
   picture: string;
