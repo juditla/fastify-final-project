@@ -1,12 +1,24 @@
+export const TattooImage = {
+  type: 'object',
+  properties: {
+    id: { type: 'number' },
+    name: { type: 'string' },
+    style: { type: 'string' },
+    picture: { type: 'string' },
+    artistId: { type: 'number' },
+  },
+};
+
 export const Artist = {
   type: 'object',
   properties: {
     name: { type: 'string' },
     // id: { type: 'number' }, // brauch ich das hier???
-    descritption: { type: 'string' },
+    description: { type: 'string' },
     userId: { type: 'number' },
     studioId: { type: 'number' },
     style: { type: 'string' },
+    tattooImages: { type: { TattooImage } },
   },
 };
 
@@ -26,9 +38,9 @@ export const getArtistsOpts = {
 export const getArtistOpts = {
   schema: {
     tags: ['artists'],
-    response: {
-      200: Artist,
-    },
+    // response: {
+    //   200: Artist,
+    // },
   },
 };
 
@@ -48,9 +60,9 @@ export const postArtistOpts = {
         token: { type: 'string' },
       },
     },
-    response: {
-      201: Artist,
-    },
+    // response: {
+    //   201: Artist,
+    // },
   },
 };
 
@@ -71,8 +83,8 @@ export const deleteArtistOpts = {
 export const updateArtistOpts = {
   schema: {
     tags: ['artists'],
-    response: {
-      200: Artist,
-    },
+    // response: {
+    //   200: Artist,
+    // },
   },
 };
