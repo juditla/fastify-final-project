@@ -2,7 +2,7 @@ import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
   addArtist,
   deleteArtist,
-  getArtist,
+  getArtistByUserId,
   getArtists,
   updateArtist,
 } from '../../controllers/artists.js';
@@ -24,7 +24,7 @@ export function artistRoutes(
   fastify.get('/artists', getArtistsOpts, getArtists);
 
   // Get single artist
-  fastify.get('/artists/:id', getArtistOpts, getArtist);
+  fastify.get('/artists/:userid', getArtistOpts, getArtistByUserId);
 
   // Add artist
   fastify.post('/artists', postArtistOpts, addArtist);
