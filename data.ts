@@ -1,4 +1,4 @@
-import { Artist, Studio, studioImage, tattooImage } from './types.js';
+import { Artist, Studio, StudioImage, TattooImage } from './types.js';
 
 export const studios: Studio[] = [
   {
@@ -70,7 +70,7 @@ export const artists: Artist[] = [
   },
 ];
 
-export const tattooImages: tattooImage[] = [
+export const tattooImages: TattooImage[] = [
   {
     id: 1,
     name: 'picture1',
@@ -113,7 +113,7 @@ export const tattooImages: tattooImage[] = [
   },
 ];
 
-export const studioImages: studioImage[] = [
+export const studioImages: StudioImage[] = [
   {
     id: 1,
     name: 'studiopicture1',
