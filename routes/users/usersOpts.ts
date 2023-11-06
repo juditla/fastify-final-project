@@ -8,6 +8,7 @@ export const UserWithPassword = {
     lastName: { type: 'string' },
     password: { type: 'string' },
     roleId: { type: 'number' },
+    createDate: { type: 'string' },
   },
 } as const;
 
