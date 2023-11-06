@@ -1,17 +1,26 @@
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+import { v2 as cloudinary } from 'cloudinary';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { artistRoutes } from './routes/artists/artists.js';
 import { loginRoutes } from './routes/login/login.js';
 import { sessionRoutes } from './routes/sessions/sessions.js';
 import { studioRoutes } from './routes/studios/studios.js';
+import { tattooImageRoutes } from './routes/tattooimages/tattooimages.js';
 import { userRoutes } from './routes/users/users.js';
 
 const fastify = Fastify({
   logger: true,
 });
 
-fastify.register(fastifySwagger),
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: `${process.env.CLOUDINARY_API_KEY}`,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  // secure: true,
+});
+
+await fastify.register(fastifySwagger),
   {
     exposeRoute: true,
     routePrefix: '/docs',
@@ -20,7 +29,7 @@ fastify.register(fastifySwagger),
     },
   };
 
-fastify.register(fastifySwaggerUi),
+await fastify.register(fastifySwaggerUi),
   {
     routePrefix: '/documentation',
     uiConfig: {
@@ -51,15 +60,21 @@ fastify.register(fastifySwaggerUi),
     // transformSpecificationClone: true,
   };
 
-fastify.get('/', async () => {
-  return { hello: 'world' };
-});
+// fastify.get('/', async () => {
+//   return { hello: 'world' };
+// });
 
-fastify.register(studioRoutes);
-fastify.register(artistRoutes);
-fastify.register(userRoutes);
-fastify.register(loginRoutes);
-fastify.register(sessionRoutes);
+await fastify.register(studioRoutes);
+await fastify.register(artistRoutes);
+await fastify.register(userRoutes);
+await fastify.register(loginRoutes);
+await fastify.register(sessionRoutes);
+await fastify.register(tattooImageRoutes);
+fastify.addHook('onRoute', (routeOptions) => {
+  if (routeOptions.path === 'tattooimages') {
+    routeOptions.bodyLimit = 10000000;
+  }
+});
 
 /**
  * Run the server!
@@ -67,10 +82,10 @@ fastify.register(sessionRoutes);
 const PORT = 4000;
 const start = async () => {
   try {
-    await fastify.listen({ port: PORT });
+    await fastify.listen({ host: 'localhost', port: PORT });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
   }
 };
-start();
+await start();
