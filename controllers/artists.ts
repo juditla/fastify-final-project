@@ -15,8 +15,6 @@ type Artist = {
   token: string;
 };
 
-type ArtistNoId = Omit<Artist, 'id'>;
-
 type AddArtistRequest = FastifyRequest<{
   Body: Artist;
 }>;
@@ -26,6 +24,10 @@ type UpdateArtistRequest = FastifyRequest<{
   Body: Artist;
 }>;
 
+type GetArtistByUserID = FastifyRequest<{
+  Params: { userid: string };
+}>;
+
 export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
   const artistsFromDatabase = await prisma.artist.findMany({
     include: {
@@ -33,17 +35,27 @@ export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
       tattooImages: true,
     },
   });
-  reply.send(artistsFromDatabase);
+  await reply.send(artistsFromDatabase);
 };
 
-export const getArtist = async (req: ParamsIdRequest, reply: FastifyReply) => {
-  const id = Number(req.params.id);
-  const artist = await prisma.artist.findUnique({
+export const getArtistByUserId = async (
+  req: GetArtistByUserID,
+  reply: FastifyReply,
+) => {
+  console.log('ich bin hier');
+  console.log('params:', req.params.userid);
+  const userId = Number(req.params.userid);
+  console.log(userId);
+  const artist = await prisma.artist.findFirst({
     where: {
-      id,
+      userId,
+    },
+    include: {
+      tattooImages: true,
     },
   });
-  reply.send(artist);
+  console.log(artist);
+  await reply.send(artist);
 };
 
 const artistSchema = z.object({
@@ -65,7 +77,7 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
     },
   });
   if (!validSessionFromDatabase) {
-    reply.code(400).send({ message: 'Invalid session' });
+    await reply.code(400).send({ message: 'Invalid session' });
   } else {
     // if valid session then validate input then create artist, get the userid from the valid session
     const validatedNewArtist = artistSchema.safeParse({
@@ -74,8 +86,7 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
       description,
     });
     if (!validatedNewArtist.success) {
-      console.log(validatedNewArtist);
-      reply.code(400).send({ message: 'input validation failed' });
+      await reply.code(400).send({ message: 'input validation failed' });
     } else {
       try {
         const newArtist = await prisma.artist.create({
@@ -87,13 +98,13 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
             // studioId: 0,
           },
         });
-        reply.code(201).send(newArtist);
+        await reply.code(201).send(newArtist);
         if (!newArtist) {
-          reply.code(406).send({ message: 'error creating new artist' });
+          await reply.code(406).send({ message: 'error creating new artist' });
         }
       } catch (error) {
         console.log(error);
-        reply.code(500).send({ message: 'error' });
+        await reply.code(500).send({ message: 'error' });
       }
     }
   }
@@ -110,10 +121,12 @@ export const deleteArtist = async (
     },
   });
   if (artist) {
-    reply.code(200).send({ message: `Studio ${artist.name} has been deleted` });
+    await reply
+      .code(200)
+      .send({ message: `Artist ${artist.name} has been deleted` });
   } else {
-    reply.code(400).send({
-      message: `An error occured while deleting the studio. The studio could not be found, please try again`,
+    await reply.code(400).send({
+      message: `An error occured while deleting the artit. The artist could not be found, please try again`,
     });
   }
 };
@@ -137,5 +150,5 @@ export const updateArtist = async (
 
   // code der das Studio dann wirklich in die database updated
 
-  reply.code(201).send(artist);
+  await reply.code(201).send(artist);
 };

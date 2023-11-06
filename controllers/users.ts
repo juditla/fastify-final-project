@@ -2,8 +2,8 @@ import crypto from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { ParamsIdRequest } from 'types.js';
 import { z } from 'zod';
+import { ParamsIdRequest } from '../types.js';
 
 const prisma = new PrismaClient();
 
@@ -42,7 +42,7 @@ export const getUsers = async (req: FastifyRequest, reply: FastifyReply) => {
   });
 
   // errorhandling!!
-  reply.send(usersFromDatabase);
+  await reply.send(usersFromDatabase);
 };
 
 // rethink this function, do I need it? call prisma.user.findUnique in login already & bei addUser to check for existing user email
@@ -51,17 +51,16 @@ export const getUserById = async (
   reply: FastifyReply,
 ) => {
   const id = Number(req.params.id);
-  console.log(id);
   const userFromDatabase = await prisma.user.findUnique({
     where: {
       id,
     },
   });
   if (!userFromDatabase) {
-    reply.code(400).send({ message: 'User could not be found' });
+    await reply.code(400).send({ message: 'User could not be found' });
   }
-  console.log(userFromDatabase);
-  reply.send(userFromDatabase);
+  console.log('userFromDatabase');
+  await reply.send(userFromDatabase);
 };
 
 const newUserSchema = z.object({
@@ -169,5 +168,5 @@ export const updateUser = async (
     },
   });
 
-  reply.code(201).send(updateUser);
+  await reply.code(201).send(updateUser);
 };

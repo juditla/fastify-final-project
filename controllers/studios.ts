@@ -33,7 +33,7 @@ type UpdateStudioRequest = FastifyRequest<{
 
 export const getStudios = async (req: FastifyRequest, reply: FastifyReply) => {
   const studiosFromDatabase = await prisma.studio.findMany();
-  reply.send(studiosFromDatabase);
+  await reply.send(studiosFromDatabase);
 };
 
 export const getStudio = async (req: ParamsIdRequest, reply: FastifyReply) => {
@@ -44,12 +44,12 @@ export const getStudio = async (req: ParamsIdRequest, reply: FastifyReply) => {
     },
   });
 
-  reply.send(studio);
+  await reply.send(studio);
 };
 
 // works until here!!!! everything below still needs to be worked on!!!!
 
-export const addStudio = (req: AddStudioRequest, reply: FastifyReply) => {
+export const addStudio = async (req: AddStudioRequest, reply: FastifyReply) => {
   const { name, address, city, postalCode, ownerId, longitude, latitude } =
     req.body;
   const studio = {
@@ -67,15 +67,18 @@ export const addStudio = (req: AddStudioRequest, reply: FastifyReply) => {
 
   // code der das Studio dann wirklich in die database speichert!
 
-  reply.code(201).send(studio);
+  await reply.code(201).send(studio);
 };
-export const deleteStudio = (req: ParamsIdRequest, reply: FastifyReply) => {
+export const deleteStudio = async (
+  req: ParamsIdRequest,
+  reply: FastifyReply,
+) => {
   const id = Number(req.params.id);
   const studio = studios.find((studio) => studio.id === id);
   if (studio) {
-    reply.send({ message: `Studio ${studio.name} has been deleted` });
+    await reply.send({ message: `Studio ${studio.name} has been deleted` });
   } else {
-    reply.send({
+    await reply.send({
       message: `An error occured while deleting the studio. The studio could not be found, please try again`,
     });
   }

@@ -19,11 +19,11 @@ const loginSchema = z.object({
 });
 
 export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
-  const { email, password } = req.body;
+  const password = req.body.password;
+  const email = req.body.email.toLowerCase();
   // input validation
   const validatedLogin = loginSchema.safeParse({ email, password });
   if (!validatedLogin.success) {
-    console.log(validatedLogin);
     return reply.code(404).send('input validation failed');
   } else {
     // find user with this unique email
@@ -64,10 +64,12 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
     });
 
     if (!session) {
-      reply.code(401).send({});
-      return JSON.stringify({ message: 'Error creating the new session' });
+      await reply.code(401).send({ message: 'Error creating the new session' });
     }
 
-    reply.send({ token: session.token, expiresAt: session.expiryTimestamp });
+    await reply.send({
+      token: session.token,
+      expiresAt: session.expiryTimestamp,
+    });
   }
 };

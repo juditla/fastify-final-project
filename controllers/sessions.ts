@@ -18,6 +18,19 @@ type DeleteSession = FastifyRequest<{
 
 const tokenSchema = z.string().min(100).max(150);
 
+// delete all expired sessions
+export const deleteInvalidSession = async () => {
+  const now = new Date();
+  // delete session
+  await prisma.session.deleteMany({
+    where: {
+      expiryTimestamp: {
+        lt: now.toISOString(),
+      },
+    },
+  });
+};
+
 export const validateSession = async (
   req: ValidateSession,
   reply: FastifyReply,
@@ -28,7 +41,7 @@ export const validateSession = async (
   const validatedToken = tokenSchema.safeParse(token);
   if (!validatedToken.success) {
     console.log(validatedToken.error);
-    reply.code(400).send({ message: 'input validation failed' });
+    await reply.code(400).send({ message: 'input validation failed' });
   } else {
     const now = new Date();
     console.log(now.toISOString());
@@ -41,11 +54,11 @@ export const validateSession = async (
       },
     });
     // calls function that deletes all sessions with expired expiry date
-    deleteInvalidSession();
+    deleteInvalidSession().catch((error) => console.log(error));
 
     // no valid session
     if (!validSessionFromDatabase) {
-      reply.code(400).send({ message: 'Invalid session' });
+      await reply.code(400).send({ message: 'Invalid session' });
     } else {
       const userFromToken = await prisma.user.findUnique({
         where: {
@@ -57,21 +70,9 @@ export const validateSession = async (
           id: true,
         },
       });
-      reply.code(200).send(userFromToken);
+      await reply.code(200).send(userFromToken);
     }
   }
-};
-
-// delete all expired sessions
-export const deleteInvalidSession = async () => {
-  const now = new Date();
-  const expiredSessions = await prisma.session.deleteMany({
-    where: {
-      expiryTimestamp: {
-        lt: now.toISOString(),
-      },
-    },
-  });
 };
 
 // for logout, deletes session even though it would be still valid
@@ -80,10 +81,12 @@ export const deleteSessionByToken = async (
   reply: FastifyReply,
 ) => {
   const token = req.body.token;
-  const deleteSession = await prisma.session.delete({
+
+  // delete session
+  await prisma.session.delete({
     where: {
       token,
     },
   });
-  reply.code(200).send({ message: 'Session deleted' });
+  await reply.code(200).send({ message: 'Session deleted' });
 };
