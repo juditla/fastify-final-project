@@ -6,7 +6,7 @@ import { ParamsIdRequest } from '../types.js';
 const prisma = new PrismaClient();
 
 type Artist = {
-  // id: number;
+  id: number;
   style: string;
   studioId?: number;
   userId: number;
@@ -21,7 +21,11 @@ type AddArtistRequest = FastifyRequest<{
 
 type UpdateArtistRequest = FastifyRequest<{
   Params: { id: string };
-  Body: Artist;
+  Body: {
+    name: string;
+    description: string;
+    style: string;
+  };
 }>;
 
 type GetArtistByUserID = FastifyRequest<{
@@ -98,6 +102,15 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
             // studioId: 0,
           },
         });
+
+        const userWithChangedRole = await prisma.user.update({
+          where: {
+            id: newArtist.userId,
+          },
+          data: {
+            roleId: 1,
+          },
+        });
         await reply.code(201).send(newArtist);
         if (!newArtist) {
           await reply.code(406).send({ message: 'error creating new artist' });
@@ -121,6 +134,15 @@ export const deleteArtist = async (
     },
   });
   if (artist) {
+    // change roleId for corresponding user
+    const userWithChangedRole = await prisma.user.update({
+      where: {
+        id: artist.userId,
+      },
+      data: {
+        roleId: 2,
+      },
+    });
     await reply
       .code(200)
       .send({ message: `Artist ${artist.name} has been deleted` });
@@ -136,19 +158,33 @@ export const updateArtist = async (
   reply: FastifyReply,
 ) => {
   // here still necessary to define how changing an artists will look like
-  const { id } = req.params;
-  const { name, style, studioId, userId, description } = req.body;
-
-  const artist = {
-    id,
+  const id = Number(req.params.id);
+  console.log(id);
+  const { name, style, description } = req.body;
+  // const studioId = req.body.studioId
+  const validatedArtistToUpdate = artistSchema.safeParse({
     name,
     style,
-    studioId,
-    userId,
     description,
-  };
+  });
+  if (!validatedArtistToUpdate.success) {
+    await reply.code(400).send({ message: 'input validation failed' });
+  } else {
+    try {
+      const updatedArtist = await prisma.artist.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+          style,
+          description,
+        },
+      });
 
-  // code der das Studio dann wirklich in die database updated
-
-  await reply.code(201).send(artist);
+      await reply.code(201).send(updatedArtist);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 };
