@@ -3,7 +3,9 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import { v2 as cloudinary } from 'cloudinary';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { artistRoutes } from './routes/artists/artists.js';
+import { conversationsRoutes } from './routes/conversations/conversations.js';
 import { loginRoutes } from './routes/login/login.js';
+import { messagesRoutes } from './routes/messages/messages.js';
 import { sessionRoutes } from './routes/sessions/sessions.js';
 import { studioRoutes } from './routes/studios/studios.js';
 import { tattooImageRoutes } from './routes/tattooimages/tattooimages.js';
@@ -15,7 +17,7 @@ const fastify = Fastify({
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: `${process.env.CLOUDINARY_API_KEY}`,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
   // secure: true,
 });
@@ -60,16 +62,15 @@ await fastify.register(fastifySwaggerUi),
     // transformSpecificationClone: true,
   };
 
-// fastify.get('/', async () => {
-//   return { hello: 'world' };
-// });
-
 await fastify.register(studioRoutes);
 await fastify.register(artistRoutes);
 await fastify.register(userRoutes);
 await fastify.register(loginRoutes);
 await fastify.register(sessionRoutes);
 await fastify.register(tattooImageRoutes);
+await fastify.register(conversationsRoutes);
+await fastify.register(messagesRoutes);
+
 fastify.addHook('onRoute', (routeOptions) => {
   if (routeOptions.path === 'tattooimages') {
     routeOptions.bodyLimit = 10000000;
