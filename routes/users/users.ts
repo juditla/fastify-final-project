@@ -1,7 +1,7 @@
 import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
   addUser,
-  deleteUserByEmail,
+  deleteUserById,
   getUserById,
   getUsers,
   updateUser,
@@ -28,7 +28,7 @@ export function userRoutes(
   fastify.post('/users', postUserOpts, addUser);
 
   // Delete user
-  fastify.delete('/users/:id', deleteUserOpts, deleteUserByEmail);
+  fastify.delete('/users/:id', deleteUserOpts, deleteUserById);
 
   // Update user
   fastify.put('/users/:id', updateUserOpts, updateUser);
