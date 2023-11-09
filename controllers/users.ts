@@ -20,15 +20,12 @@ type AddUserRequest = FastifyRequest<{
 
 type UpdateUserRequest = FastifyRequest<{
   Body: {
+    id: number;
     email: string;
     firstName: string;
     lastName: string;
     password?: string;
   };
-}>;
-
-type DeleteUserByEmail = FastifyRequest<{
-  Body: { email: string };
 }>;
 
 // where do I need all users?
@@ -85,7 +82,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
   });
   if (!validatedNewUser) {
     console.log('Input validation failed');
-    reply.code(400).send({ message: 'input validation failed' });
+    await reply.code(400).send({ message: 'input validation failed' });
   } else {
     // check if username already in use
     try {
@@ -95,7 +92,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
         },
       });
       if (user) {
-        reply
+        await reply
           .code(500)
           .send({ message: 'User with this email address already exists' });
       }
@@ -115,7 +112,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
       });
 
       if (!newUser) {
-        reply.code(406).send({ message: 'error creating new user' });
+        await reply.code(406).send({ message: 'error creating new user' });
       }
 
       // create token
@@ -135,7 +132,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
           .send({ message: 'Error creating the new session' });
       }
 
-      reply.code(201).send(newUser);
+      await reply.code(201).send(newUser);
     } catch (error) {
       console.log('error', error);
     }
@@ -144,13 +141,34 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
 
 // works till here, code below not yet in use
 
-export const deleteUserByEmail = async (
-  req: DeleteUserByEmail,
+export const deleteUserById = async (
+  req: ParamsIdRequest,
   reply: FastifyReply,
 ) => {
-  const email = req.body.email;
-  const deletedUser = prisma.user.delete({ where: { email } });
+  console.log('landing here in deleteUserById');
+  const id = Number(req.params.id);
+  const deletedUser = await prisma.user.delete({
+    where: {
+      id,
+    },
+  });
+  // console.log(deletedUser);
+  if (deletedUser) {
+    await reply.code(200).send({
+      message: `User with email ${deletedUser.email} has been deleted`,
+    });
+  } else {
+    await reply.code(400).send({
+      message: `An error occured while deleting the user. The user could not be found, please try again`,
+    });
+  }
 };
+
+const updateUserSchema = z.object({
+  firstName: z.string().min(3),
+  lastName: z.string().min(3),
+  email: z.string().email(),
+});
 
 export const updateUser = async (
   req: UpdateUserRequest,
@@ -158,15 +176,25 @@ export const updateUser = async (
 ) => {
   const { email, lastName, firstName } = req.body;
 
-  const updateUser = await prisma.user.update({
-    where: {
-      email,
-    },
-    data: {
-      firstName,
-      lastName,
-    },
+  const validatedUserToUpdate = updateUserSchema.safeParse({
+    firstName,
+    lastName,
+    email,
   });
+  if (!validatedUserToUpdate) {
+    console.log('Input validation failed');
+    await reply.code(400).send({ message: 'input validation failed' });
+  } else {
+    const updateUser = await prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        firstName,
+        lastName,
+      },
+    });
 
-  await reply.code(201).send(updateUser);
+    await reply.code(201).send(updateUser);
+  }
 };

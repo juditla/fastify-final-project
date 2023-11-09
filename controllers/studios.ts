@@ -84,7 +84,10 @@ export const deleteStudio = async (
   }
 };
 
-export const updateStudio = (req: UpdateStudioRequest, reply: FastifyReply) => {
+export const updateStudio = async (
+  req: UpdateStudioRequest,
+  reply: FastifyReply,
+) => {
   const { id } = req.params;
   const { name, address, city, postalCode, ownerId, longitude, latitude } =
     req.body;
@@ -105,5 +108,5 @@ export const updateStudio = (req: UpdateStudioRequest, reply: FastifyReply) => {
 
   // code der das Studio dann wirklich in die database updated
 
-  reply.code(201).send(studio);
+  await reply.code(201).send(studio);
 };
