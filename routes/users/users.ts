@@ -1,12 +1,14 @@
 import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
   addUser,
+  changePassword,
   deleteUserById,
   getUserById,
   getUsers,
   updateUser,
 } from '../../controllers/users.js';
 import {
+  changePasswordOpts,
   deleteUserOpts,
   getUserOpts,
   postUserOpts,
@@ -32,6 +34,8 @@ export function userRoutes(
 
   // Update user
   fastify.put('/users/:id', updateUserOpts, updateUser);
+
+  fastify.put('/users/changepassword/:id', changePasswordOpts, changePassword);
 
   done();
 }

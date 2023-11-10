@@ -2,8 +2,10 @@ import crypto from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { UserWithPassword } from 'routes/users/usersOpts.js';
 import { z } from 'zod';
 import { ParamsIdRequest } from '../types.js';
+import { validateSession } from './sessions.js';
 
 const prisma = new PrismaClient();
 
@@ -25,6 +27,17 @@ type UpdateUserRequest = FastifyRequest<{
     firstName: string;
     lastName: string;
     password?: string;
+  };
+}>;
+
+type ChangePasswordRequest = FastifyRequest<{
+  Params: {
+    id: number;
+  };
+  Body: {
+    token: string;
+    oldPassword: string;
+    newPassword: string;
   };
 }>;
 
@@ -196,5 +209,83 @@ export const updateUser = async (
     });
 
     await reply.code(201).send(updateUser);
+  }
+};
+
+export const changePassword = async (
+  req: ChangePasswordRequest,
+  reply: FastifyReply,
+) => {
+  const { token, oldPassword, newPassword } = req.body;
+  const userId = Number(req.params.id);
+
+  // input validation
+
+  // token => valid session?
+  const now = new Date();
+  const validSessionFromDatabase = await prisma.session.findUnique({
+    where: {
+      token,
+      expiryTimestamp: {
+        gt: now.toISOString(),
+      },
+    },
+  });
+
+  // belongs valid session to this userId?
+  if (!validSessionFromDatabase) {
+    await reply.code(400).send({ message: 'Invalid session' });
+  } else {
+    const userFromToken = await prisma.user.findUnique({
+      where: {
+        id: validSessionFromDatabase.userId,
+      },
+      select: {
+        firstName: true,
+        roleId: true,
+        id: true,
+        password: true,
+      },
+    });
+    if (userFromToken) {
+      if (userFromToken.id !== userId) {
+        console.log('userFromtokenId', userFromToken.id);
+        console.log('userId', userId);
+        await reply
+          .code(400)
+          .send({ message: 'Invalid request - userFromToken.id not userId' });
+      }
+
+      // check if passsword is correct
+      const isOldPasswordValid = await bcrypt.compare(
+        oldPassword,
+        userFromToken.password,
+      );
+      console.log('isOldpasswordValid', isOldPasswordValid);
+      // if password is wrong
+      if (!isOldPasswordValid) {
+        await reply
+          .code(403)
+          .send({ message: 'Invalid request - is old password valid' }); // message this way to 'confuse' possible hacker
+      } else {
+        console.log('hier vor hashedNewPassword');
+        // create hash for new Password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+        // change password
+        const changedUser = await prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            password: hashedNewPassword,
+          },
+        });
+        await reply
+          .code(200)
+          .send({ message: 'Your password has been changed' });
+      }
+    } else {
+      await reply.code(400).send({ message: 'Invalid request' });
+    }
   }
 };

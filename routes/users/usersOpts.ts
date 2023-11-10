@@ -87,3 +87,14 @@ export const updateUserOpts = {
     },
   },
 };
+
+export const changePasswordOpts = {
+  schema: {
+    tags: ['users', 'password'],
+    // response: {
+    //   200: {
+    //     message: 'string',
+    //   },
+    // },
+  },
+};
