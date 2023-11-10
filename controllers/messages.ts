@@ -1,8 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { Conversation } from 'routes/conversations/conversationsOpts.js';
 import { z } from 'zod';
-import { ParamsIdRequest } from '../types.js';
 
 const prisma = new PrismaClient();
 
