@@ -103,7 +103,7 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
           },
         });
 
-        const userWithChangedRole = await prisma.user.update({
+        await prisma.user.update({
           where: {
             id: newArtist.userId,
           },
@@ -135,7 +135,7 @@ export const deleteArtist = async (
   });
   if (artist) {
     // change roleId for corresponding user
-    const userWithChangedRole = await prisma.user.update({
+    await prisma.user.update({
       where: {
         id: artist.userId,
       },
