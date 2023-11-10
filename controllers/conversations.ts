@@ -95,7 +95,7 @@ export const addConversation = async (
     console.log('userIdfromArtist', userIdFromArtist);
     if (userIdFromArtist) {
       // check if there already is a conversation between those two
-      const existingConversation = await prisma.conversation.findMany({
+      const existingConversation = await prisma.conversation.findFirst({
         where: {
           OR: [
             {
@@ -126,7 +126,7 @@ export const addConversation = async (
         },
       });
       console.log(existingConversation);
-      if (existingConversation.length > 0) {
+      if (existingConversation) {
         await reply.code(201).send(existingConversation);
       } else {
         // validate input
