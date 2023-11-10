@@ -50,8 +50,7 @@ export const getStudio = async (req: ParamsIdRequest, reply: FastifyReply) => {
 // works until here!!!! everything below still needs to be worked on!!!!
 
 export const addStudio = async (req: AddStudioRequest, reply: FastifyReply) => {
-  const { name, address, city, postalCode, ownerId, longitude, latitude } =
-    req.body;
+  const { name, address, city, postalCode, ownerId } = req.body;
   const studio = {
     name,
     address,
@@ -74,9 +73,11 @@ export const deleteStudio = async (
   reply: FastifyReply,
 ) => {
   const id = Number(req.params.id);
-  const studio = studios.find((studio) => studio.id === id);
-  if (studio) {
-    await reply.send({ message: `Studio ${studio.name} has been deleted` });
+  const deletedStudio = 'abc'; // hier prisma code
+  if (deleteStudio) {
+    await reply.send({
+      message: `Studio ${deletedStudio.name} has been deleted`,
+    });
   } else {
     await reply.send({
       message: `An error occured while deleting the studio. The studio could not be found, please try again`,
@@ -89,8 +90,7 @@ export const updateStudio = async (
   reply: FastifyReply,
 ) => {
   const { id } = req.params;
-  const { name, address, city, postalCode, ownerId, longitude, latitude } =
-    req.body;
+  const { name, address, city, postalCode, ownerId } = req.body;
 
   const studio = {
     id,
@@ -100,12 +100,6 @@ export const updateStudio = async (
     postalCode,
     ownerId,
   };
-  if (longitude && latitude) {
-    // find out why this is not working
-    // studio.longitude = longitude;
-    // studio.latitude = latitude;
-  }
-
   // code der das Studio dann wirklich in die database updated
 
   await reply.code(201).send(studio);
