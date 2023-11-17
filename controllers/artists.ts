@@ -46,10 +46,7 @@ export const getArtistByUserId = async (
   req: GetArtistByUserID,
   reply: FastifyReply,
 ) => {
-  console.log('ich bin hier');
-  console.log('params:', req.params.userid);
   const userId = Number(req.params.userid);
-  console.log(userId);
   const artist = await prisma.artist.findFirst({
     where: {
       userId,
@@ -157,9 +154,7 @@ export const updateArtist = async (
   req: UpdateArtistRequest,
   reply: FastifyReply,
 ) => {
-  // here still necessary to define how changing an artists will look like
   const id = Number(req.params.id);
-  console.log(id);
   const { name, style, description } = req.body;
   // const studioId = req.body.studioId
   const validatedArtistToUpdate = artistSchema.safeParse({

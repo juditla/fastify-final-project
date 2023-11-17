@@ -65,13 +65,6 @@ export const addConversation = async (
 ) => {
   const { userId, artistId, token } = req.body;
 
-  // what are the steps?
-  // must be valid session
-  // get userId from artistId
-  // check if there is already a conversation between those two
-  // if not create this conversation
-  // return either existing or new conversation
-
   // check if session is valid
   const now = new Date();
   const validSessionFromDatabase = await prisma.session.findUnique({

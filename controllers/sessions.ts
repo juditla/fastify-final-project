@@ -37,14 +37,11 @@ export const validateSession = async (
 ) => {
   // compare expiry date from session, only get from database if timestamp is greater than (gt) now
   const token = req.body.token;
-  console.log(token);
   const validatedToken = tokenSchema.safeParse(token);
   if (!validatedToken.success) {
-    console.log(validatedToken.error);
     await reply.code(400).send({ message: 'input validation failed' });
   } else {
     const now = new Date();
-    console.log(now.toISOString());
     const validSessionFromDatabase = await prisma.session.findUnique({
       where: {
         token,

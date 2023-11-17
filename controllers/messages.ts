@@ -30,9 +30,7 @@ export const getMessagesByConversationId = async (
   req: GetMessageByConversationRequest,
   reply: FastifyReply,
 ) => {
-  console.log(req.params);
   const conversationId = Number(req.params.conversationid);
-  console.log('conversationId', conversationId);
   const messagesfromDatabase = await prisma.message.findMany({
     where: {
       conversationId,

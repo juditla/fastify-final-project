@@ -38,6 +38,7 @@ export const postImageById = async (
     .upload(`data:image/png;base64,${base64Image}`)
     .then(async (result) => {
       console.log(result);
+      // placeholder used! - at this point adding name, style and state of the booleans not yet implemented,
       const uploadedImage = await prisma.tattooImages.create({
         data: {
           name: 'abc',
@@ -51,11 +52,6 @@ export const postImageById = async (
       });
       await reply.code(201).send(uploadedImage);
     });
-
-  // console.log(uploadedImage);
-  // upload to cloudinary
-  // safe url in datqabase
-  // return url?
 };
 
 export const getImagesByArtistId = async (
