@@ -9,6 +9,7 @@ export const UserWithPassword = {
     password: { type: 'string' },
     roleId: { type: 'number' },
     createDate: { type: 'string' },
+    avatar: { type: 'string' },
   },
 } as const;
 
@@ -21,6 +22,7 @@ export const UserWithoutPassword = {
     firstName: { type: 'string' },
     lastName: { type: 'string' },
     roleId: { type: 'number' },
+    avatar: { type: 'string' },
   },
 };
 
@@ -96,5 +98,17 @@ export const changePasswordOpts = {
     //     message: 'string',
     //   },
     // },
+  },
+};
+
+export const postProfilePictureOpts = {
+  schema: {
+    tags: ['users', 'profile picture'],
+  },
+};
+
+export const updateProfilePictureOpts = {
+  schema: {
+    tags: ['users', 'profile picture'],
   },
 };

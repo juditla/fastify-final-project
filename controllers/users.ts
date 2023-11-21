@@ -1,11 +1,11 @@
 import crypto from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { v2 as cloudinary } from 'cloudinary';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { UserWithPassword } from 'routes/users/usersOpts.js';
 import { z } from 'zod';
 import { ParamsIdRequest } from '../types.js';
-import { validateSession } from './sessions.js';
+import { PostImageRequest } from './tattooimages.js';
 
 const prisma = new PrismaClient();
 
@@ -43,9 +43,7 @@ type ChangePasswordRequest = FastifyRequest<{
 
 // where do I need all users?
 export const getUsers = async (req: FastifyRequest, reply: FastifyReply) => {
-  const usersFromDatabase = await prisma.user.findMany({
-    include: {},
-  });
+  const usersFromDatabase = await prisma.user.findMany({});
 
   // errorhandling!!
   await reply.send(usersFromDatabase);
@@ -147,6 +145,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
       await reply.code(201).send(newUser);
     } catch (error) {
       console.log('error', error);
+      await reply.code(406).send({ message: 'Error creating new user' });
     }
   }
 };
@@ -159,17 +158,24 @@ export const deleteUserById = async (
 ) => {
   console.log('landing here in deleteUserById');
   const id = Number(req.params.id);
-  const deletedUser = await prisma.user.delete({
-    where: {
-      id,
-    },
-  });
-  // console.log(deletedUser);
-  if (deletedUser) {
-    await reply.code(200).send({
-      message: `User with email ${deletedUser.email} has been deleted`,
+  try {
+    const deletedUser = await prisma.user.delete({
+      where: {
+        id,
+      },
     });
-  } else {
+    // console.log(deletedUser);
+    if (!deletedUser) {
+      await reply.code(400).send({
+        message: `An error occured while deleting the user. The user could not be found, please try again`,
+      });
+    } else {
+      await reply.code(200).send({
+        message: `User with email ${deletedUser.email} has been deleted`,
+      });
+    }
+  } catch (error) {
+    console.log('error', error);
     await reply.code(400).send({
       message: `An error occured while deleting the user. The user could not be found, please try again`,
     });
@@ -182,7 +188,7 @@ const updateUserSchema = z.object({
   email: z.string().email(),
 });
 
-export const updateUser = async (
+export const updateUserByEmail = async (
   req: UpdateUserRequest,
   reply: FastifyReply,
 ) => {
@@ -294,7 +300,7 @@ export const changePassword = async (
           await reply.code(400).send({ message: 'Something went wrong!' });
         }
         // change password
-        const changedUser = await prisma.user.update({
+        await prisma.user.update({
           where: {
             id: userId,
           },
@@ -310,4 +316,74 @@ export const changePassword = async (
       await reply.code(400).send({ message: 'Invalid request' });
     }
   }
+};
+
+export const addProfilePicture = async (
+  req: PostImageRequest,
+  reply: FastifyReply,
+) => {
+  const base64Image = req.body.base64Image;
+  const userId = req.body.id;
+
+  const image = await cloudinary.uploader
+    .upload(`data:image/png;base64,${base64Image}`)
+    .then(async (result) => {
+      console.log(result);
+
+      const userWithUploadedImage = await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          avatar: result.secure_url,
+          avatarPublicId: result.public_id,
+        },
+      });
+      await reply.code(201).send(userWithUploadedImage.avatar);
+    });
+};
+
+export const updateProfilePicture = async (
+  req: PostImageRequest,
+  reply: FastifyReply,
+) => {
+  const base64Image = req.body.base64Image;
+  const userId = req.body.id;
+
+  // upload new picture
+  const image = await cloudinary.uploader
+    .upload(`data:image/png;base64,${base64Image}`)
+    .then(async (result) => {
+      console.log(result);
+
+      // get existing picture public_id
+      const oldPicture = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          avatarPublicId: true,
+        },
+      });
+      // upload new picture
+      const newPicture = await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          avatar: result.secure_url,
+          avatarPublicId: result.public_id,
+        },
+      });
+
+      //  delete old picture
+      if (oldPicture?.avatarPublicId) {
+        const image = await cloudinary.uploader
+          .destroy(oldPicture.avatarPublicId)
+          .then(async (result) => {
+            console.log(result);
+          });
+      }
+      await reply.code(201).send(newPicture);
+    });
 };

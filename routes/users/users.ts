@@ -1,17 +1,21 @@
 import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
+  addProfilePicture,
   addUser,
   changePassword,
   deleteUserById,
   getUserById,
   getUsers,
-  updateUser,
+  updateProfilePicture,
+  updateUserByEmail,
 } from '../../controllers/users.js';
 import {
   changePasswordOpts,
   deleteUserOpts,
   getUserOpts,
+  postProfilePictureOpts,
   postUserOpts,
+  updateProfilePictureOpts,
   updateUserOpts,
 } from './usersOpts.js';
 
@@ -33,9 +37,22 @@ export function userRoutes(
   fastify.delete('/users/:id', deleteUserOpts, deleteUserById);
 
   // Update user
-  fastify.put('/users/:id', updateUserOpts, updateUser);
+  fastify.put('/users/:id', updateUserOpts, updateUserByEmail);
 
+  // Change password
   fastify.put('/users/changepassword/:id', changePasswordOpts, changePassword);
 
+  // Add profile picture
+  fastify.post(
+    '/users/profilepicture/:id',
+    postProfilePictureOpts,
+    addProfilePicture,
+  );
+
+  fastify.put(
+    '/users/profilepicture',
+    updateProfilePictureOpts,
+    updateProfilePicture,
+  );
   done();
 }
