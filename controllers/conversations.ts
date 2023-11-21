@@ -40,6 +40,7 @@ export const getConversationsByUserId = async (
           // @ts-ignore
           id: true,
           firstName: true,
+          avatar: true,
         },
       },
       participant: {
@@ -47,6 +48,17 @@ export const getConversationsByUserId = async (
           // @ts-ignore
           id: true,
           firstName: true,
+          avatar: true,
+        },
+      },
+      message: {
+        orderBy: {
+          createDate: 'desc',
+        },
+        take: 1,
+        select: {
+          text: true,
+          createDate: true,
         },
       },
     },
