@@ -5,7 +5,7 @@ import { ParamsIdRequest } from '../types.js';
 
 const prisma = new PrismaClient();
 
-type PostImageRequest = FastifyRequest<{
+export type PostImageRequest = FastifyRequest<{
   Body: {
     base64Image: string;
     id: number;
@@ -48,6 +48,7 @@ export const postImageById = async (
           isWannado: false,
           isDone: false,
           isReserved: false,
+          picturePublicId,
         },
       });
       await reply.code(201).send(uploadedImage);
