@@ -53,6 +53,18 @@ export const getArtistByUserId = async (
     },
     include: {
       tattooImages: true,
+      user: {
+        select: {
+          avatar: true,
+          firstName: true,
+        },
+      },
+      studio: {
+        select: {
+          name: true,
+          id: true,
+        },
+      },
     },
   });
   console.log(artist);
