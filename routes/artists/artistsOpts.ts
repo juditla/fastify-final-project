@@ -19,6 +19,8 @@ export const Artist = {
     studioId: { type: 'number' },
     style: { type: 'string' },
     tattooImages: { type: { TattooImage } },
+    user: { type: 'object' },
+    studio: { type: 'object' },
   },
 };
 
