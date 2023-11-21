@@ -2,7 +2,7 @@ import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
   addStudio,
   deleteStudio,
-  getStudio,
+  getStudioById,
   getStudios,
   updateStudio,
 } from '../../controllers/studios.js';
@@ -23,7 +23,7 @@ export function studioRoutes(
   fastify.get('/studios', getStudiosOpts, getStudios);
 
   // Get single studio
-  fastify.get('/studios/:id', getStudioOpts, getStudio);
+  fastify.get('/studios/:id', getStudioOpts, getStudioById);
 
   // Add studio
   fastify.post('/studios', postStudioOpts, addStudio);

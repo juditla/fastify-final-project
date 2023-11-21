@@ -36,11 +36,31 @@ export const getStudios = async (req: FastifyRequest, reply: FastifyReply) => {
   await reply.send(studiosFromDatabase);
 };
 
-export const getStudio = async (req: ParamsIdRequest, reply: FastifyReply) => {
+export const getStudioById = async (
+  req: ParamsIdRequest,
+  reply: FastifyReply,
+) => {
+  const params = req.params;
   const id = Number(req.params.id);
+  console.log('id', id);
+  console.log('params', params);
   const studio = await prisma.studio.findUnique({
     where: {
       id,
+    },
+    include: {
+      artist: {
+        select: {
+          name: true,
+          style: true,
+          userId: true,
+          user: {
+            select: {
+              avatar: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -74,7 +94,7 @@ export const deleteStudio = async (
 ) => {
   const id = Number(req.params.id);
   const deletedStudio = 'abc'; // hier prisma code
-  if (deleteStudio) {
+  if (deletedStudio) {
     await reply.send({
       message: `Studio ${deletedStudio.name} has been deleted`,
     });
