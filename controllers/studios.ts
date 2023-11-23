@@ -33,7 +33,18 @@ type UpdateStudioRequest = FastifyRequest<{
 
 export const getStudios = async (req: FastifyRequest, reply: FastifyReply) => {
   const studiosFromDatabase = await prisma.studio.findMany();
-  await reply.send(studiosFromDatabase);
+  const studioImagesFromDatabase = await prisma.studioImages.findMany();
+
+  const studiosWithImages = studiosFromDatabase.map((studio) => {
+    const studioImage = studioImagesFromDatabase.find(
+      (image) => image.studioId === studio.id,
+    );
+    studio.picture = studioImage.picture;
+    studio.pictureId = studioImage.id;
+    return studio;
+  });
+  console.log(studiosWithImages);
+  await reply.send(studiosWithImages);
 };
 
 export const getStudioById = async (
@@ -92,11 +103,12 @@ export const deleteStudio = async (
   req: ParamsIdRequest,
   reply: FastifyReply,
 ) => {
+  // TODO
   const id = Number(req.params.id);
   const deletedStudio = 'abc'; // hier prisma code
   if (deletedStudio) {
     await reply.send({
-      message: `Studio ${deletedStudio.name} has been deleted`,
+      message: `Studio has been deleted`,
     });
   } else {
     await reply.send({
