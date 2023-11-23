@@ -34,7 +34,7 @@ export const postImageById = async (
   const base64Image = req.body.base64Image;
   const artistId = req.body.id;
 
-  const image = await cloudinary.uploader
+  await cloudinary.uploader
     .upload(`data:image/png;base64,${base64Image}`)
     .then(async (result) => {
       console.log(result);
@@ -48,7 +48,7 @@ export const postImageById = async (
           isWannado: false,
           isDone: false,
           isReserved: false,
-          picturePublicId,
+          picturePublicId: result.public_id,
         },
       });
       await reply.code(201).send(uploadedImage);
