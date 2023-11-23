@@ -7,6 +7,7 @@ import { conversationsRoutes } from './routes/conversations/conversations.js';
 import { loginRoutes } from './routes/login/login.js';
 import { messagesRoutes } from './routes/messages/messages.js';
 import { sessionRoutes } from './routes/sessions/sessions.js';
+import { studioImageRoutes } from './routes/studioimages/studioimages.js';
 import { studioRoutes } from './routes/studios/studios.js';
 import { tattooImageRoutes } from './routes/tattooimages/tattooimages.js';
 import { userRoutes } from './routes/users/users.js';
@@ -70,6 +71,7 @@ await fastify.register(sessionRoutes);
 await fastify.register(tattooImageRoutes);
 await fastify.register(conversationsRoutes);
 await fastify.register(messagesRoutes);
+await fastify.register(studioImageRoutes);
 
 fastify.addHook('onRoute', (routeOptions) => {
   if (routeOptions.path === 'tattooimages') {
