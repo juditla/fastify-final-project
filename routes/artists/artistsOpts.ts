@@ -13,14 +13,14 @@ export const Artist = {
   type: 'object',
   properties: {
     name: { type: 'string' },
-    // id: { type: 'number' }, // brauch ich das hier???
-    description: { type: 'string' },
+    id: { type: 'number' },
     userId: { type: 'number' },
+    description: { type: 'string' },
     studioId: { type: 'number' },
     style: { type: 'string' },
-    tattooImages: { type: { TattooImage } },
-    user: { type: 'object' },
-    studio: { type: 'object' },
+    tattooImages: { type: 'array' },
+    user: { avatar: { type: 'string' }, firstName: { type: 'string' } },
+    studio: { name: { type: 'string' }, studioId: { type: 'number' } },
   },
 };
 
@@ -40,9 +40,9 @@ export const getArtistsOpts = {
 export const getArtistOpts = {
   schema: {
     tags: ['artists'],
-    // response: {
-    //   200: Artist,
-    // },
+    response: {
+      200: Artist,
+    },
   },
 };
 
