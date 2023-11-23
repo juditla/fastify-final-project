@@ -8,3 +8,6 @@ dist
 
 # Next.js build folder
 .next
+
+# Prisma folder
+prisma
