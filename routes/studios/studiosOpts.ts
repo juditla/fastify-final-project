@@ -1,5 +1,3 @@
-import { Artist, TattooImage } from '../artists/artistsOpts.js';
-
 // Studio schema
 export const Studio = {
   type: 'object',
@@ -12,6 +10,7 @@ export const Studio = {
     ownerId: { type: 'number' },
     // tattooImages: { type: [TattooImage] },
     artist: { type: 'object' },
+
     // longitude: { type: 'string' },
     // latitude: { type: 'string' },
   },
