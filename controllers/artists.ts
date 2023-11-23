@@ -92,6 +92,7 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
   if (!validSessionFromDatabase) {
     await reply.code(400).send({ message: 'Invalid session' });
   } else {
+    console.log('validsession', validSessionFromDatabase);
     // if valid session then validate input then create artist, get the userid from the valid session
     const validatedNewArtist = artistSchema.safeParse({
       name,
@@ -108,7 +109,6 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
             style,
             userId: validSessionFromDatabase.userId,
             description,
-            // studioId: 0,
           },
         });
 
