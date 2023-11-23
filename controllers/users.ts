@@ -121,6 +121,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
         },
       });
 
+      console.log('newUser', newUser);
       if (!newUser) {
         await reply.code(406).send({ message: 'error creating new user' });
       }
@@ -135,7 +136,7 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
           token,
         },
       });
-
+      console.log('session', session);
       if (!session) {
         return reply
           .code(401)
@@ -339,7 +340,8 @@ export const addProfilePicture = async (
           avatarPublicId: result.public_id,
         },
       });
-      await reply.code(201).send(userWithUploadedImage.avatar);
+      console.log('avatar', userWithUploadedImage.avatar);
+      await reply.code(201).send({ avatar: userWithUploadedImage.avatar });
     });
 };
 
