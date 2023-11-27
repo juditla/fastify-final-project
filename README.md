@@ -28,11 +28,7 @@ Link to repository: <a href='https://github.com/juditla/react-native-final-proje
 
 ## Screenshots
 
-
-
 <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/Login-Screen.png" alt="login screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/ArtistOverview-Screen.png" alt="artist overview screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/ArtistDetail-Screen.png" alt="artist details screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/StudioOverview-Screen.png" alt="studio overview screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/StudioDetail-Screen.png" alt="studio details screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/ConversationOverview-Screen.png" alt="conversation overview screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/Chat-Screen.png" alt="chat screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/Profile-Screen.png" alt="profile screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/EditProfile-Screen.png" alt="edit profile screen" width="300" height="auto" />
-
-
 
 ## Setup guide
 
@@ -61,4 +57,4 @@ To run this project locally, the following steps are needed:
   - Run `pnpm prisma migrate dev`to migrate the databases
   - Finally run `pnpm start`
 
-- To set up the frontend part of the project, go to <a href='https://github.com/juditla/react-native-final-project'>react-native-final-project</a> and follow the instructions there
+- To set up the frontend part of the project, go to <a href='https://github.com/juditla/react-native-final-project'>react-native-final-project</a> and follow the set up instructions there
