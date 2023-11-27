@@ -28,11 +28,12 @@ Link to repository: <a href='https://github.com/juditla/react-native-final-proje
 
 ## Screenshots
 
-![Login screen](https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/Login-Screen.png 'Login screen')
 
-Artists overview
 
-Single artist page through dynamic routing
+<img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/Login-Screen.png" alt="login screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/ArtistOverview-Screen.png" alt="artist overview screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/ArtistDetail-Screen.png" alt="artist details screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/StudioOverview-Screen.png" alt="studio overview screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/StudioDetail-Screen.png" alt="studio details screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/ConversationOverview-Screen.png" alt="conversation overview screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/Chat-Screen.png" alt="chat screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/Profile-Screen.png" alt="profile screen" width="300" height="auto" /> <img src="https://github.com/juditla/fastify-final-project/blob/main/assets/screenshot/EditProfile-Screen.png" alt="edit profile screen" width="300" height="auto" />
+
+
+
 
 Studio overview
 
