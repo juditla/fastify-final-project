@@ -28,7 +28,7 @@ Link to repository: <a href='https://github.com/juditla/react-native-final-proje
 
 ## Screenshots
 
-![Login screen](https://github.com/juditla/fastify-final-project/blob/main/Login-Screen.jpg?raw=true)
+![Login screen](https://github.com/juditla/fastify-final-project/blob/main/Login-Screen.png?raw=true)
 
 Artists overview
 
