@@ -34,19 +34,6 @@ Link to repository: <a href='https://github.com/juditla/react-native-final-proje
 
 
 
-
-Studio overview
-
-Single studio
-
-Conversation overview
-
-Messaging
-
-Profile page of an artist
-
-Edit profile
-
 ## Setup guide
 
 To run this project locally, the following steps are needed:
