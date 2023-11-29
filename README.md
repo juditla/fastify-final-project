@@ -1,4 +1,4 @@
-# INKSPIRE
+# INKSPIRE - Backend
 
 Inkspire is a mobile application developed with React Native and Expo optimised for iOS.
 The application is designed to connect users with local tattoo artists, providing a platform to explore their artwork and facilitate communication.
