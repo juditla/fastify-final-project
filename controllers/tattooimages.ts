@@ -37,7 +37,6 @@ export const postImageById = async (
   await cloudinary.uploader
     .upload(`data:image/png;base64,${base64Image}`)
     .then(async (result) => {
-      console.log(result);
       // placeholder for name and style used!
       // at this point adding name, style and state of the booleans not yet implemented frontend side
       const uploadedImage = await prisma.tattooImages.create({

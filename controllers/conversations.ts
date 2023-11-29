@@ -89,7 +89,6 @@ export const addConversation = async (
         id: artistId,
       },
     });
-    console.log('userIdfromArtist', userIdFromArtist);
     if (userIdFromArtist) {
       // check if there already is a conversation between those two
       const existingConversation = await prisma.conversation.findFirst({
