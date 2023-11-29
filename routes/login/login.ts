@@ -7,7 +7,7 @@ import { loginOpts } from './loginOpts.js';
 export function loginRoutes(
   fastify: FastifyInstance,
   options: FastifySchema,
-  done: (err?: FastifyError) => void, // in types.ts im root dir alle tyoes die ich öfter brauche definieren und exportieren
+  done: (err?: FastifyError) => void,
 ) {
   fastify.post('/login', loginOpts, loginHandler);
 

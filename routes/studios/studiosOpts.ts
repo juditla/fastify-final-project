@@ -8,11 +8,7 @@ export const Studio = {
     city: { type: 'string' },
     postalCode: { type: 'number' },
     ownerId: { type: 'number' },
-    // tattooImages: { type: [TattooImage] },
     artist: { type: 'object' },
-
-    // longitude: { type: 'string' },
-    // latitude: { type: 'string' },
   },
 };
 
@@ -32,9 +28,6 @@ export const getStudiosOpts = {
 export const getStudioOpts = {
   schema: {
     tags: ['studios'],
-    // response: {
-    //   200: Studio,
-    // },
   },
 };
 
@@ -44,21 +37,7 @@ export const postStudioOpts = {
     body: {
       type: 'object',
       required: ['name', 'address', 'city', 'postalCode', 'ownerId'],
-      // properties: {
-      //   name: { type: 'string' },
-      //   // id: { type: 'number' }, // brauch ich das hier???
-      //   address: { type: 'string' },
-      //   city: { type: 'string' },
-      //   postalCode: { type: 'number' },
-      //   ownerId: { type: 'number' },
-      //   // longitude: { type: 'string' },
-      //   // latitude: { type: 'string' },
-      //   tattooImages: { type: [TattooImage] },
-      // },
     },
-    // response: {
-    //   201: Studio,
-    // },
   },
 };
 

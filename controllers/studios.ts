@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { studios } from '../data.js';
 import { ParamsIdRequest } from '../types.js';
 
 const prisma = new PrismaClient();
@@ -35,15 +34,13 @@ export const getStudios = async (req: FastifyRequest, reply: FastifyReply) => {
   const studiosFromDatabase = await prisma.studio.findMany();
   const studioImagesFromDatabase = await prisma.studioImages.findMany();
 
+  // temporary unsafe solution, new migration needed to add picture + pictureId to studio table as in artists
   const studiosWithImages = studiosFromDatabase.map((studio) => {
-    const studioImage = studioImagesFromDatabase.find(
-      (image) => image.studioId === studio.id,
-    );
+    studioImagesFromDatabase.find((image) => image.studioId === studio.id);
     studio.picture = studioImage.picture;
     studio.pictureId = studioImage.id;
     return studio;
   });
-  console.log(studiosWithImages);
   await reply.send(studiosWithImages);
 };
 
@@ -51,10 +48,7 @@ export const getStudioById = async (
   req: ParamsIdRequest,
   reply: FastifyReply,
 ) => {
-  const params = req.params;
   const id = Number(req.params.id);
-  console.log('id', id);
-  console.log('params', params);
   const studio = await prisma.studio.findUnique({
     where: {
       id,
@@ -78,34 +72,35 @@ export const getStudioById = async (
   await reply.send(studio);
 };
 
-// works until here!!!! everything below still needs to be worked on!!!!
-
+// works until here!!!! - everything below still needs to be worked on!!!!
 export const addStudio = async (req: AddStudioRequest, reply: FastifyReply) => {
   const { name, address, city, postalCode, ownerId } = req.body;
-  const studio = {
-    name,
-    address,
-    city,
-    postalCode,
-    ownerId,
-  };
-  // if (longitude && latitude) {
-  // find out why this is not working
-  // studio.longitude = longitude;
-  // studio.latitude = latitude;
-  // }
 
-  // code der das Studio dann wirklich in die database speichert!
+  const newStudio = await prisma.studio.create({
+    data: {
+      name,
+      address,
+      city,
+      postalCode,
+      ownerId,
+    },
+  });
+  if (!newStudio) {
+    await reply.code(400).send({ message: 'Error creating new studio' });
+  }
 
-  await reply.code(201).send(studio);
+  await reply.code(201).send(newStudio);
 };
 export const deleteStudio = async (
   req: ParamsIdRequest,
   reply: FastifyReply,
 ) => {
-  // TODO
   const id = Number(req.params.id);
-  const deletedStudio = 'abc'; // hier prisma code
+  const deletedStudio = await prisma.studio.delete({
+    where: {
+      id,
+    },
+  });
   if (deletedStudio) {
     await reply.send({
       message: `Studio has been deleted`,
@@ -121,7 +116,7 @@ export const updateStudio = async (
   req: UpdateStudioRequest,
   reply: FastifyReply,
 ) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
   const { name, address, city, postalCode, ownerId } = req.body;
 
   const studio = {
@@ -133,6 +128,24 @@ export const updateStudio = async (
     ownerId,
   };
   // code der das Studio dann wirklich in die database updated
-
-  await reply.code(201).send(studio);
+  const updatedStudio = await prisma.studio.update({
+    where: {
+      id,
+    },
+    data: {
+      id,
+      name,
+      address,
+      city,
+      postalCode,
+      ownerId,
+    },
+  });
+  if (updatedStudio) {
+    await reply.code(201).send(studio);
+  } else {
+    await reply
+      .code(400)
+      .send({ message: 'There was an error updating the studio' });
+  }
 };

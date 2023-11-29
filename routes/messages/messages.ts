@@ -10,7 +10,6 @@ export function messagesRoutes(
   options: FastifySchema,
   done: (err?: FastifyError) => void,
 ) {
-  // schema defines how request body should look like, required fields, how standard response is defined, tags for swagger (ui)
   // Get all Messages from conversation
   fastify.get(
     '/messages/:conversationid',

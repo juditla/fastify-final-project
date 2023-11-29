@@ -26,18 +26,6 @@ export const UserWithoutPassword = {
   },
 };
 
-export const getUsersOpts = {
-  schema: {
-    tags: ['users'],
-    response: {
-      200: {
-        type: 'array',
-        studios: UserWithoutPassword,
-      },
-    },
-  },
-} as const;
-
 export const getUserOpts = {
   schema: {
     tags: ['users'],
@@ -53,7 +41,6 @@ export const postUserOpts = {
     body: {
       required: ['email', 'firstName', 'lastName', 'password'],
       properties: {
-        // id: { type: 'number' },
         email: { type: 'string' },
         firstName: { type: 'string' },
         lastName: { type: 'string' },
@@ -93,11 +80,6 @@ export const updateUserOpts = {
 export const changePasswordOpts = {
   schema: {
     tags: ['users', 'password'],
-    // response: {
-    //   200: {
-    //     message: 'string',
-    //   },
-    // },
   },
 };
 

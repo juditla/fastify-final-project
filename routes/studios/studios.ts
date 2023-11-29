@@ -17,7 +17,7 @@ import {
 export function studioRoutes(
   fastify: FastifyInstance,
   options: FastifySchema,
-  done: (err?: FastifyError) => void, // in types.ts im root dir alle tyoes die ich öfter brauche definieren und exportieren
+  done: (err?: FastifyError) => void,
 ) {
   // Get all studios
   fastify.get('/studios', getStudiosOpts, getStudios);

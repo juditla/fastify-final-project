@@ -5,7 +5,6 @@ import {
   changePassword,
   deleteUserById,
   getUserById,
-  getUsers,
   updateProfilePicture,
   updateUserByEmail,
 } from '../../controllers/users.js';
@@ -24,9 +23,6 @@ export function userRoutes(
   options: FastifySchema,
   done: (err?: FastifyError) => void,
 ) {
-  // Get all studios
-  fastify.get('/users', getUserOpts, getUsers);
-
   // Get single user by email
   fastify.get('/users/:id', getUserOpts, getUserById);
 

@@ -19,7 +19,6 @@ export function artistRoutes(
   options: FastifySchema,
   done: (err?: FastifyError) => void,
 ) {
-  // schema defines how request body should look like, required fields, how standard response is defined, tags for swagger (ui)
   // Get all artists
   fastify.get('/artists', getArtistsOpts, getArtists);
 

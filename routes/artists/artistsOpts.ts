@@ -54,7 +54,6 @@ export const postArtistOpts = {
       required: ['name', 'style', 'token', 'description'],
       properties: {
         name: { type: 'string' },
-        // id: { type: 'number' }, // brauch ich das hier???
         description: { type: 'string' },
         userId: { type: 'number' },
         studioId: { type: 'number' },
@@ -62,9 +61,6 @@ export const postArtistOpts = {
         token: { type: 'string' },
       },
     },
-    // response: {
-    //   201: Artist,
-    // },
   },
 };
 
@@ -85,8 +81,5 @@ export const deleteArtistOpts = {
 export const updateArtistOpts = {
   schema: {
     tags: ['artists'],
-    // response: {
-    //   200: Artist,
-    // },
   },
 };

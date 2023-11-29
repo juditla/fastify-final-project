@@ -16,6 +16,7 @@ export function tattooImageRoutes(
   // Delete image by id
   fastify.delete('/tattooimages/:id', deleteTattooImageOpts, deleteImageById);
 
+  // Add new image
   fastify.post('/tattooimages', postTattooImageOpts, postImageById);
 
   done();

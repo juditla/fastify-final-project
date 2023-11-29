@@ -67,7 +67,6 @@ export const getArtistByUserId = async (
       },
     },
   });
-  console.log(artist);
   await reply.send(artist);
 };
 
@@ -120,13 +119,13 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
             roleId: 1,
           },
         });
-        await reply.code(201).send(newArtist);
         if (!newArtist) {
           await reply.code(406).send({ message: 'error creating new artist' });
+        } else {
+          await reply.code(201).send(newArtist);
         }
       } catch (error) {
-        console.log(error);
-        await reply.code(500).send({ message: 'error' });
+        await reply.code(500).send({ message: error });
       }
     }
   }
@@ -168,14 +167,14 @@ export const updateArtist = async (
 ) => {
   const id = Number(req.params.id);
   const { name, style, description } = req.body;
-  // const studioId = req.body.studioId
+
   const validatedArtistToUpdate = artistSchema.safeParse({
     name,
     style,
     description,
   });
   if (!validatedArtistToUpdate.success) {
-    await reply.code(400).send({ message: 'input validation failed' });
+    await reply.code(400).send({ message: 'Input validation failed' });
   } else {
     try {
       const updatedArtist = await prisma.artist.update({

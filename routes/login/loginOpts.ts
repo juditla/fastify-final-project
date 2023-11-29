@@ -8,14 +8,5 @@ export const loginOpts = {
         password: { type: 'string' },
       },
     },
-    // response: {
-    //   201: {
-    //     type: 'object',
-    //     properties: {
-    //       message: { type: 'string' },
-    //       token: { type: 'string' },
-    //     },
-    //   },
-    // },
   },
 };

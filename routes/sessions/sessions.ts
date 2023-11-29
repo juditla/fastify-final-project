@@ -10,8 +10,6 @@ export function sessionRoutes(
   options: FastifySchema,
   done: (err?: FastifyError) => void,
 ) {
-  // Think about routes path for delete, should be /:token?
-
   // Get valid session by token
   fastify.post('/sessions', postSessionOpts, validateSession);
 

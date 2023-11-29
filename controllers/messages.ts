@@ -4,14 +4,6 @@ import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
-type Message = {
-  id: number;
-  senderId: number;
-  coinversationtId: number;
-  createDate: Date;
-  text: string;
-};
-
 type GetMessageByConversationRequest = FastifyRequest<{
   Params: {
     conversationid: string;
@@ -84,8 +76,7 @@ export const addMessage = async (
         await reply.code(406).send({ message: 'error creating new message' });
       }
     } catch (error) {
-      console.log(error);
-      await reply.code(500).send({ message: 'error' });
+      await reply.code(500).send({ message: error });
     }
   }
 };

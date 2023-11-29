@@ -5,13 +5,6 @@ import { ParamsIdRequest } from '../types.js';
 
 const prisma = new PrismaClient();
 
-type Conversation = {
-  id: number;
-  ownerId: number;
-  participantId: number;
-  createDate: string;
-};
-
 type AddConversationRequest = FastifyRequest<{
   Body: {
     userId: number;
@@ -91,7 +84,6 @@ export const addConversation = async (
     await reply.code(400).send({ message: 'Invalid session' });
   } else {
     // get userId form artist
-    console.log('artistId', artistId);
     const userIdFromArtist = await prisma.artist.findUnique({
       where: {
         id: artistId,
@@ -130,7 +122,6 @@ export const addConversation = async (
           },
         },
       });
-      console.log(existingConversation);
       if (existingConversation) {
         await reply.code(201).send(existingConversation);
       } else {
@@ -157,8 +148,7 @@ export const addConversation = async (
                 .send({ message: 'error creating new conversation' });
             }
           } catch (error) {
-            console.log(error);
-            await reply.code(500).send({ message: 'error' });
+            await reply.code(500).send({ message: error });
           }
         }
       }

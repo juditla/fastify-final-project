@@ -7,12 +7,6 @@ export const postSessionOpts = {
         token: { type: 'string' },
       },
     },
-    // response: {
-    //   200: {
-    //     type: 'object',
-    //     userFromToken: { firstName: 'string', roleId: 'number' },
-    //   },
-    // },
   },
 };
 

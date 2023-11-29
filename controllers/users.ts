@@ -41,14 +41,6 @@ type ChangePasswordRequest = FastifyRequest<{
   };
 }>;
 
-// where do I need all users?
-export const getUsers = async (req: FastifyRequest, reply: FastifyReply) => {
-  const usersFromDatabase = await prisma.user.findMany({});
-
-  // errorhandling!!
-  await reply.send(usersFromDatabase);
-};
-
 // rethink this function, do I need it? call prisma.user.findUnique in login already & bei addUser to check for existing user email
 export const getUserById = async (
   req: ParamsIdRequest,
@@ -63,7 +55,6 @@ export const getUserById = async (
   if (!userFromDatabase) {
     await reply.code(400).send({ message: 'User could not be found' });
   }
-  console.log('userFromDatabase');
   await reply.send(userFromDatabase);
 };
 
@@ -76,11 +67,10 @@ const newUserSchema = z.object({
 });
 
 export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
-  console.log('REQ', req.body);
   const { firstName, lastName, password, roleId } = req.body;
   const email = req.body.email.toLowerCase();
   const hashedPassword = await bcrypt.hash(password, 12);
-  console.log(hashedPassword);
+
   // input validation
   const validatedNewUser = newUserSchema.safeParse({
     email,
@@ -90,8 +80,6 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
     roleId,
   });
   if (!validatedNewUser.success) {
-    console.log('Input validation failed');
-    console.log(validatedNewUser.error);
     await reply.code(400).send({ message: 'input validation failed' });
   } else {
     // check if username already in use
@@ -102,12 +90,10 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
         },
       });
       if (user) {
-        await reply
-          .code(500)
-          .send({ message: 'User with this email address already exists' });
+        await reply.code(500).send({ message: 'User could not be created' });
       }
     } catch (error) {
-      console.log('error', error);
+      await reply.code(500).send({ message: 'User could not be created' });
     }
     // create new user in database
     try {
@@ -121,7 +107,6 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
         },
       });
 
-      console.log('newUser', newUser);
       if (!newUser) {
         await reply.code(406).send({ message: 'error creating new user' });
       }
@@ -136,28 +121,23 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
           token,
         },
       });
-      console.log('session', session);
+
       if (!session) {
         return reply
           .code(401)
           .send({ message: 'Error creating the new session' });
       }
-
       await reply.code(201).send(newUser);
     } catch (error) {
-      console.log('error', error);
       await reply.code(406).send({ message: 'Error creating new user' });
     }
   }
 };
 
-// works till here, code below not yet in use
-
 export const deleteUserById = async (
   req: ParamsIdRequest,
   reply: FastifyReply,
 ) => {
-  console.log('landing here in deleteUserById');
   const id = Number(req.params.id);
   try {
     const deletedUser = await prisma.user.delete({
@@ -165,7 +145,6 @@ export const deleteUserById = async (
         id,
       },
     });
-    // console.log(deletedUser);
     if (!deletedUser) {
       await reply.code(400).send({
         message: `An error occured while deleting the user. The user could not be found, please try again`,
@@ -176,7 +155,6 @@ export const deleteUserById = async (
       });
     }
   } catch (error) {
-    console.log('error', error);
     await reply.code(400).send({
       message: `An error occured while deleting the user. The user could not be found, please try again`,
     });
@@ -201,7 +179,6 @@ export const updateUserByEmail = async (
     email,
   });
   if (!validatedUserToUpdate.success) {
-    console.log('Input validation failed');
     await reply.code(400).send({ message: 'input validation failed' });
   } else {
     const updateUser = await prisma.user.update({
@@ -283,7 +260,7 @@ export const changePassword = async (
         oldPassword,
         userFromToken.password,
       );
-      console.log('isOldpasswordValid', isOldPasswordValid);
+
       // if password is wrong
       if (!isOldPasswordValid) {
         await reply
@@ -326,11 +303,9 @@ export const addProfilePicture = async (
   const base64Image = req.body.base64Image;
   const userId = req.body.id;
 
-  const image = await cloudinary.uploader
+  await cloudinary.uploader
     .upload(`data:image/png;base64,${base64Image}`)
     .then(async (result) => {
-      console.log(result);
-
       const userWithUploadedImage = await prisma.user.update({
         where: {
           id: userId,
@@ -340,7 +315,6 @@ export const addProfilePicture = async (
           avatarPublicId: result.public_id,
         },
       });
-      console.log('avatar', userWithUploadedImage.avatar);
       await reply.code(201).send({ avatar: userWithUploadedImage.avatar });
     });
 };
@@ -353,11 +327,9 @@ export const updateProfilePicture = async (
   const userId = req.body.id;
 
   // upload new picture
-  const image = await cloudinary.uploader
+  await cloudinary.uploader
     .upload(`data:image/png;base64,${base64Image}`)
     .then(async (result) => {
-      console.log(result);
-
       // get existing picture public_id
       const oldPicture = await prisma.user.findUnique({
         where: {
@@ -380,11 +352,7 @@ export const updateProfilePicture = async (
 
       //  delete old picture
       if (oldPicture?.avatarPublicId) {
-        const image = await cloudinary.uploader
-          .destroy(oldPicture.avatarPublicId)
-          .then(async (result) => {
-            console.log(result);
-          });
+        await cloudinary.uploader.destroy(oldPicture.avatarPublicId);
       }
       await reply.code(201).send(newPicture);
     });
