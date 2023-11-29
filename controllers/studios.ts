@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 
 type AddStudioRequest = FastifyRequest<{
   Body: {
-    id: number; // is this true?
     name: string;
     address: string;
     city: string;
@@ -36,9 +35,11 @@ export const getStudios = async (req: FastifyRequest, reply: FastifyReply) => {
 
   // temporary unsafe solution, new migration needed to add picture + pictureId to studio table as in artists
   const studiosWithImages = studiosFromDatabase.map((studio) => {
-    studioImagesFromDatabase.find((image) => image.studioId === studio.id);
-    studio.picture = studioImage.picture;
-    studio.pictureId = studioImage.id;
+    const studioImage = studioImagesFromDatabase.find(
+      (image) => image.studioId === studio.id,
+    );
+    studio.picture = studioImage?.picture ? studioImage.picture : '';
+    studio.pictureId = studioImage?.id ? studioImage.id : '';
     return studio;
   });
   await reply.send(studiosWithImages);
