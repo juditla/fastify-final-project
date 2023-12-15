@@ -22,6 +22,7 @@ export const UserWithoutPassword = {
     firstName: { type: 'string' },
     roleId: { type: 'number' },
     avatar: { type: 'string' },
+    createDate: { type: 'string' },
   },
 };
 

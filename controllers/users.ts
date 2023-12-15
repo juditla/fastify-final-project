@@ -57,6 +57,7 @@ export const getUserById = async (
       firstName: true,
       roleId: true,
       avatar: true,
+      createDate: true,
     },
   });
   if (!userFromDatabase) {
