@@ -11,7 +11,6 @@ const prisma = new PrismaClient();
 
 type AddUserRequest = FastifyRequest<{
   Body: {
-    // id: number;
     email: string;
     firstName: string;
     lastName: string;
@@ -41,6 +40,7 @@ type ChangePasswordRequest = FastifyRequest<{
   };
 }>;
 
+// GET USER BY ID
 // rethink this function, do I need it? call prisma.user.findUnique in login already & bei addUser to check for existing user email
 export const getUserById = async (
   req: ParamsIdRequest,
@@ -51,13 +51,22 @@ export const getUserById = async (
     where: {
       id,
     },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      roleId: true,
+      avatar: true,
+    },
   });
   if (!userFromDatabase) {
-    await reply.code(400).send({ message: 'User could not be found' });
+    await reply.code(404).send({ message: 'User could not be found' });
   }
   await reply.send(userFromDatabase);
 };
 
+// ADD USER
+// input validation schema for new user
 const newUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(60).max(60),
@@ -90,10 +99,10 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
         },
       });
       if (user) {
-        await reply.code(500).send({ message: 'User could not be created' });
+        await reply.code(400).send({ message: 'User could not be created' });
       }
     } catch (error) {
-      await reply.code(500).send({ message: 'User could not be created' });
+      await reply.code(400).send({ message: 'User could not be created' });
     }
     // create new user in database
     try {
@@ -105,10 +114,17 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
           password: hashedPassword,
           roleId,
         },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          roleId: true,
+          avatar: true,
+        },
       });
 
       if (!newUser) {
-        await reply.code(406).send({ message: 'error creating new user' });
+        await reply.code(500).send({ message: 'Error creating new user' });
       }
 
       // create token
@@ -124,16 +140,17 @@ export const addUser = async (req: AddUserRequest, reply: FastifyReply) => {
 
       if (!session) {
         return reply
-          .code(401)
+          .code(500)
           .send({ message: 'Error creating the new session' });
       }
       await reply.code(201).send(newUser);
     } catch (error) {
-      await reply.code(406).send({ message: 'Error creating new user' });
+      await reply.code(500).send({ message: 'Error creating new user' });
     }
   }
 };
 
+// DELETE USER
 export const deleteUserById = async (
   req: ParamsIdRequest,
   reply: FastifyReply,
@@ -146,7 +163,7 @@ export const deleteUserById = async (
       },
     });
     if (!deletedUser) {
-      await reply.code(400).send({
+      await reply.code(404).send({
         message: `An error occured while deleting the user. The user could not be found, please try again`,
       });
     } else {
@@ -155,12 +172,14 @@ export const deleteUserById = async (
       });
     }
   } catch (error) {
-    await reply.code(400).send({
+    await reply.code(500).send({
       message: `An error occured while deleting the user. The user could not be found, please try again`,
     });
   }
 };
 
+// UPDATE USER INFORMATION
+// input schema to update user
 const updateUserSchema = z.object({
   firstName: z.string().min(3),
   lastName: z.string().min(3),
@@ -172,7 +191,7 @@ export const updateUserByEmail = async (
   reply: FastifyReply,
 ) => {
   const { email, lastName, firstName } = req.body;
-
+  // input validation
   const validatedUserToUpdate = updateUserSchema.safeParse({
     firstName,
     lastName,
@@ -181,6 +200,7 @@ export const updateUserByEmail = async (
   if (!validatedUserToUpdate.success) {
     await reply.code(400).send({ message: 'input validation failed' });
   } else {
+    // update user
     const updateUser = await prisma.user.update({
       where: {
         email,
@@ -189,12 +209,21 @@ export const updateUserByEmail = async (
         firstName,
         lastName,
       },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        roleId: true,
+        avatar: true,
+      },
     });
 
-    await reply.code(201).send(updateUser);
+    await reply.code(200).send(updateUser);
   }
 };
 
+// CHANGE PASSWORD
+// input validation schema
 const changePasswordSchema = z.object({
   token: z.string().min(100).max(150),
   oldPassword: z.string().min(8),
@@ -235,7 +264,7 @@ export const changePassword = async (
 
   // belongs valid session to this userId?
   if (!validSessionFromDatabase) {
-    await reply.code(400).send({ message: 'Invalid session' });
+    await reply.code(401).send({ message: 'Invalid session' });
   } else {
     const userFromToken = await prisma.user.findUnique({
       where: {
@@ -251,8 +280,8 @@ export const changePassword = async (
     if (userFromToken) {
       if (userFromToken.id !== userId) {
         await reply
-          .code(400)
-          .send({ message: 'Invalid request - userFromToken.id not userId' });
+          .code(401)
+          .send({ message: 'Invalid request - request from wrong user' });
       }
 
       // check if passsword is correct
@@ -263,9 +292,7 @@ export const changePassword = async (
 
       // if password is wrong
       if (!isOldPasswordValid) {
-        await reply
-          .code(403)
-          .send({ message: 'Invalid request - is old password valid' }); // message this way to 'confuse' possible hacker
+        await reply.code(400).send({ message: 'Invalid request' }); // message this way to 'confuse' possible hacker
       } else {
         // create hash for new Password
         const hashedNewPassword = await bcrypt.hash(newPassword, 12);
@@ -296,6 +323,7 @@ export const changePassword = async (
   }
 };
 
+// ADD PROFILE PICTURE
 export const addProfilePicture = async (
   req: PostImageRequest,
   reply: FastifyReply,
@@ -314,11 +342,15 @@ export const addProfilePicture = async (
           avatar: result.secure_url,
           avatarPublicId: result.public_id,
         },
+        select: {
+          avatar: true,
+        },
       });
       await reply.code(201).send({ avatar: userWithUploadedImage.avatar });
     });
 };
 
+// CHANGE PROFILE PICTURE
 export const updateProfilePicture = async (
   req: PostImageRequest,
   reply: FastifyReply,
@@ -347,6 +379,9 @@ export const updateProfilePicture = async (
         data: {
           avatar: result.secure_url,
           avatarPublicId: result.public_id,
+        },
+        select: {
+          avatar: true,
         },
       });
 

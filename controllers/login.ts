@@ -24,7 +24,7 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
   // input validation
   const validatedLogin = loginSchema.safeParse({ email, password });
   if (!validatedLogin.success) {
-    return reply.code(404).send('input validation failed');
+    return reply.code(401).send('input validation failed');
   } else {
     // find user with this unique email
     const userWithPassword = await prisma.user.findUnique({
@@ -35,8 +35,8 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
     // user does not exist
     if (!userWithPassword) {
       return reply
-        .code(404)
-        .send({ message: 'username or password not valid' }); // message this way to 'confuse' possible hacker
+        .code(400)
+        .send({ message: 'username or password not valid' });
     }
 
     // compare password with stored hashed password
@@ -48,8 +48,8 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
     // password is wrong
     if (!isPasswordValid) {
       return reply
-        .code(403)
-        .send({ message: 'username or password not valid' }); // message this way to 'confuse' possible hacker
+        .code(400)
+        .send({ message: 'username or password not valid' });
     }
 
     // create token
@@ -61,15 +61,16 @@ export const loginHandler = async (req: LoginRequest, reply: FastifyReply) => {
         userId: userWithPassword.id,
         token,
       },
+      select: {
+        token: true,
+        expiryTimestamp: true,
+      },
     });
 
     if (!session) {
-      await reply.code(401).send({ message: 'Error creating the new session' });
+      await reply.code(500).send({ message: 'Error creating the new session' });
     }
 
-    await reply.send({
-      token: session.token,
-      expiresAt: session.expiryTimestamp,
-    });
+    await reply.code(200).send(session);
   }
 };

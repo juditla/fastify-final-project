@@ -12,6 +12,7 @@ export type PostImageRequest = FastifyRequest<{
   };
 }>;
 
+// DELETE IMAGE BY ID
 export const deleteImageById = async (
   req: ParamsIdRequest,
   reply: FastifyReply,
@@ -22,11 +23,16 @@ export const deleteImageById = async (
     where: {
       id,
     },
+    select: {
+      picture: true,
+      id: true,
+    },
   });
 
-  await reply.code(201).send(deleteTatooImage);
+  await reply.code(200).send(deleteTatooImage);
 };
 
+// ADD IMAGE TO ARTIST
 export const postImageById = async (
   req: PostImageRequest,
   reply: FastifyReply,
@@ -49,6 +55,13 @@ export const postImageById = async (
           isDone: false,
           isReserved: false,
           picturePublicId: result.public_id,
+        },
+        select: {
+          id: true,
+          picture: true,
+          artistId: true,
+          name: true,
+          style: true,
         },
       });
       await reply.code(201).send(uploadedImage);
