@@ -2,6 +2,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import { v2 as cloudinary } from 'cloudinary';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
+import fastifyLogger from 'fastify-log';
 import { artistRoutes } from './routes/artists/artists.js';
 import { conversationsRoutes } from './routes/conversations/conversations.js';
 import { loginRoutes } from './routes/login/login.js';
@@ -13,7 +14,15 @@ import { tattooImageRoutes } from './routes/tattooimages/tattooimages.js';
 import { userRoutes } from './routes/users/users.js';
 
 const fastify = Fastify({
-  logger: true,
+  logger: {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        translateTime: 'HH:MM:ss Z',
+        ignore: 'pid,hostname',
+      },
+    },
+  },
 });
 
 cloudinary.config({
@@ -62,7 +71,6 @@ await fastify.register(fastifySwaggerUi),
     // },
     // transformSpecificationClone: true,
   };
-
 await fastify.register(studioRoutes);
 await fastify.register(artistRoutes);
 await fastify.register(userRoutes);
