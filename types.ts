@@ -13,6 +13,8 @@ export type Studio = {
   ownerId: number;
   longitude?: string;
   latitude?: string;
+  picture?: string;
+  pictureId?: number;
 };
 
 export type Artist = {
@@ -40,4 +42,12 @@ export type StudioImage = {
   name: string;
   picture: string;
   studioId: number;
+};
+
+export type Message = {
+  id: number;
+  senderId: number;
+  coinversationtId: number;
+  createDate: Date;
+  text: string;
 };
