@@ -18,7 +18,7 @@ type DeleteSession = FastifyRequest<{
 
 const tokenSchema = z.string().min(100).max(150);
 
-// delete all expired sessions
+// DELETE ALL INVALID SESSIONS --> not a request from frontend
 export const deleteInvalidSession = async () => {
   const now = new Date();
   // delete session
