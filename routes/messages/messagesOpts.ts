@@ -4,8 +4,14 @@ export const Message = {
     id: { type: 'number' },
     conversationId: { type: 'number' },
     senderId: { type: 'number' },
-    createDate: { type: 'date' },
-    content: { type: 'string' },
+    createDate: { type: 'string' },
+    text: { type: 'string' },
+    sender: {
+      type: 'object',
+      properties: {
+        firstName: { type: 'string' },
+      },
+    },
   },
 };
 
@@ -13,10 +19,13 @@ export const Message = {
 export const getMessagesOpts = {
   schema: {
     tags: ['messages'],
+    params: {
+      id: { type: 'number' },
+    },
     response: {
       200: {
         type: 'array',
-        conversation: Message,
+        items: Message,
       },
     },
   },
@@ -31,8 +40,11 @@ export const postMessageOpts = {
       properties: {
         senderId: { type: 'number' },
         conversationId: { type: 'number' },
-        content: { type: 'string' },
+        text: { type: 'string' },
       },
+    },
+    response: {
+      201: Message,
     },
   },
 };

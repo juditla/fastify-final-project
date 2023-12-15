@@ -28,7 +28,11 @@ export const getMessagesByConversationId = async (
       conversationId,
     },
     include: {
-      sender: true,
+      sender: {
+        select: {
+          firstName: true,
+        },
+      },
     },
   });
   await reply.send(messagesfromDatabase);
@@ -40,6 +44,7 @@ const messageSchema = z.object({
   text: z.string().min(1),
 });
 
+// ADD NEW MESSAGE
 export const addMessage = async (
   req: AddMessageRequest,
   reply: FastifyReply,
@@ -68,12 +73,16 @@ export const addMessage = async (
           id: newMessage.id,
         },
         include: {
-          sender: true,
+          sender: {
+            select: {
+              firstName: true,
+            },
+          },
         },
       });
       await reply.code(201).send(returnMessage);
       if (!newMessage) {
-        await reply.code(406).send({ message: 'error creating new message' });
+        await reply.code(500).send({ message: 'error creating new message' });
       }
     } catch (error) {
       await reply.code(500).send({ message: error });
