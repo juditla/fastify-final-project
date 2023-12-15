@@ -8,5 +8,14 @@ export const loginOpts = {
         password: { type: 'string' },
       },
     },
+    response: {
+      200: {
+        type: 'object',
+        properties: {
+          token: { type: 'string' },
+          expiresAt: { type: 'number' },
+        },
+      },
+    },
   },
 };
