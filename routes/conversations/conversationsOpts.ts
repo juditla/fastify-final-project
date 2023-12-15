@@ -5,6 +5,29 @@ export const Conversation = {
     ownerId: { type: 'number' },
     participantId: { type: 'number' },
     createDate: { type: 'date' },
+    owner: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        firstName: { type: 'string' },
+        avatar: { type: 'string' },
+      },
+    },
+    participant: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        firstName: { type: 'string' },
+        avatar: { type: 'string' },
+      },
+    },
+    message: {
+      type: 'object',
+      properties: {
+        text: { type: 'string' },
+        createDate: { type: 'string' },
+      },
+    },
   },
 };
 
@@ -12,10 +35,13 @@ export const Conversation = {
 export const getConversationsOpts = {
   schema: {
     tags: ['conversations'],
+    params: {
+      id: { type: 'number' },
+    },
     response: {
       200: {
         type: 'array',
-        conversation: Conversation,
+        item: Conversation,
       },
     },
   },

@@ -30,7 +30,6 @@ export const getConversationsByUserId = async (
     include: {
       owner: {
         select: {
-          // @ts-ignore
           id: true,
           firstName: true,
           avatar: true,
@@ -38,7 +37,6 @@ export const getConversationsByUserId = async (
       },
       participant: {
         select: {
-          // @ts-ignore
           id: true,
           firstName: true,
           avatar: true,
@@ -56,9 +54,11 @@ export const getConversationsByUserId = async (
       },
     },
   });
-  await reply.send(conversationsFromDatabase);
+  await reply.code(200).send(conversationsFromDatabase);
 };
 
+// ADD NEW MESSAGE
+// input validation schema
 const conversationSchema = z.object({
   ownerId: z.number(),
   participantId: z.number(),
