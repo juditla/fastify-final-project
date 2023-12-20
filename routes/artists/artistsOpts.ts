@@ -51,7 +51,7 @@ export const postArtistOpts = {
     tags: ['artists'],
     body: {
       type: 'object',
-      required: ['name', 'style', 'token', 'description'],
+      required: ['name', 'style', 'token', 'description', 'userId'],
       properties: {
         name: { type: 'string' },
         description: { type: 'string' },
@@ -67,6 +67,9 @@ export const postArtistOpts = {
 export const deleteArtistOpts = {
   schema: {
     tags: ['artists'],
+    params: {
+      id: { type: 'number' },
+    },
     response: {
       200: {
         type: 'object',
@@ -81,5 +84,27 @@ export const deleteArtistOpts = {
 export const updateArtistOpts = {
   schema: {
     tags: ['artists'],
+  },
+  params: {
+    id: { type: 'number' },
+  },
+  body: {
+    type: 'object',
+    required: ['name', 'style', 'description'],
+    properties: {
+      name: { type: 'string' },
+      description: { type: 'string' },
+      style: { type: 'string' },
+    },
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        style: { type: 'string' },
+      },
+    },
   },
 };

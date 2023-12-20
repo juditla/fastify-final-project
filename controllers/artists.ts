@@ -51,7 +51,12 @@ export const getArtistByUserId = async (
     where: {
       userId,
     },
-    include: {
+    select: {
+      name: true,
+      userId: true,
+      studioId: true,
+      description: true,
+      style: true,
       tattooImages: true,
       user: {
         select: {
@@ -77,12 +82,13 @@ const artistSchema = z.object({
 });
 
 export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
-  const { name, style, description, token } = req.body;
+  const { name, style, description, token, userId } = req.body;
   // check if session is valid
   const now = new Date();
   const validSessionFromDatabase = await prisma.session.findUnique({
     where: {
       token,
+      userId,
       expiryTimestamp: {
         gt: now,
       },
@@ -105,14 +111,14 @@ export const addArtist = async (req: AddArtistRequest, reply: FastifyReply) => {
           data: {
             name,
             style,
-            userId: validSessionFromDatabase.userId,
+            userId,
             description,
           },
         });
 
         await prisma.user.update({
           where: {
-            id: newArtist.userId,
+            id: userId,
           },
           data: {
             roleId: 1,
@@ -184,6 +190,11 @@ export const updateArtist = async (
           name,
           style,
           description,
+        },
+        select: {
+          name: true,
+          style: true,
+          description: true,
         },
       });
 
