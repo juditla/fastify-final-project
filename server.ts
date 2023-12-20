@@ -2,7 +2,6 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import { v2 as cloudinary } from 'cloudinary';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
-import fastifyLogger from 'fastify-log';
 import { artistRoutes } from './routes/artists/artists.js';
 import { conversationsRoutes } from './routes/conversations/conversations.js';
 import { loginRoutes } from './routes/login/login.js';
@@ -29,7 +28,7 @@ cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-  // secure: true,
+  secure: true,
 });
 
 await fastify.register(fastifySwagger),
