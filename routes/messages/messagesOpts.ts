@@ -25,7 +25,7 @@ export const getMessagesOpts = {
     response: {
       200: {
         type: 'array',
-        items: Message,
+        message: Message,
       },
     },
   },
