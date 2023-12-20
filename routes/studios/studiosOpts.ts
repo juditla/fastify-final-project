@@ -12,6 +12,21 @@ export const Studio = {
   },
 };
 
+export const StudioWithImages = {
+  type: 'object',
+  properties: {
+    id: { type: 'number' },
+    name: { type: 'string' },
+    address: { type: 'string' },
+    city: { type: 'string' },
+    postalCode: { type: 'number' },
+    ownerId: { type: 'number' },
+    artist: { type: 'object' },
+    picture: { type: 'string' },
+    pictureId: { type: 'number' },
+  },
+};
+
 // Options for get all studios
 export const getStudiosOpts = {
   schema: {
@@ -19,7 +34,7 @@ export const getStudiosOpts = {
     response: {
       200: {
         type: 'array',
-        studios: Studio,
+        studios: StudioWithImages,
       },
     },
   },
@@ -29,8 +44,35 @@ export const getStudioOpts = {
   schema: {
     tags: ['studios'],
   },
+  params: {
+    id: { type: 'number' },
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        name: { type: 'string' },
+        address: { type: 'string' },
+        city: { type: 'string' },
+        postalCode: { type: 'number' },
+        ownerId: { type: 'number' },
+        picture: { type: 'string' },
+        pictureId: { type: 'number' },
+        artist: {
+          name: { type: 'string' },
+          style: { type: 'string' },
+          userId: { type: 'number' },
+          user: {
+            avatar: { type: 'string' },
+          },
+        },
+      },
+    },
+  },
 };
 
+// not yet implemented - TO DO
 export const postStudioOpts = {
   schema: {
     tags: ['studios'],
@@ -41,6 +83,7 @@ export const postStudioOpts = {
   },
 };
 
+// not yet implemented - TO DO
 export const deleteStudioOpts = {
   schema: {
     tags: ['studios'],
@@ -55,6 +98,7 @@ export const deleteStudioOpts = {
   },
 };
 
+// not yet implemented - TO DO
 export const updateStudioOpts = {
   schema: {
     tags: ['studios'],
