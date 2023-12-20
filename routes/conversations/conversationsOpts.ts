@@ -41,7 +41,7 @@ export const getConversationsOpts = {
     response: {
       200: {
         type: 'array',
-        item: Conversation,
+        conversation: Conversation,
       },
     },
   },
