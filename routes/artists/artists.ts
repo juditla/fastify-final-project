@@ -1,6 +1,7 @@
 import { FastifyError, FastifyInstance, FastifySchema } from 'fastify';
 import {
   addArtist,
+  addArtistRating,
   deleteArtist,
   getArtistByUserId,
   getArtists,
@@ -11,6 +12,7 @@ import {
   getArtistOpts,
   getArtistsOpts,
   postArtistOpts,
+  postArtistRatingOpts,
   updateArtistOpts,
 } from './artistsOpts.js';
 
@@ -33,6 +35,9 @@ export function artistRoutes(
 
   // Update artist
   fastify.put('/artists/:id', updateArtistOpts, updateArtist);
+
+  // Rate artist
+  fastify.post('/artists/ratings/:id', postArtistRatingOpts, addArtistRating);
 
   done();
 }
