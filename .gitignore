@@ -5,3 +5,5 @@ issueDescription.md
 
 .eslintcache
 *.tsbuildinfo
+databaseInput.sql
+inkspireDatabase.sql
