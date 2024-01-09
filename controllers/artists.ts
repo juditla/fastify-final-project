@@ -28,7 +28,7 @@ type UpdateArtistRequest = FastifyRequest<{
   };
 }>;
 
-type GetArtistByUserID = FastifyRequest<{
+type GetArtistByUserIdRequest = FastifyRequest<{
   Params: { userid: string };
 }>;
 
@@ -43,7 +43,7 @@ export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
 };
 
 export const getArtistByUserId = async (
-  req: GetArtistByUserID,
+  req: GetArtistByUserIdRequest,
   reply: FastifyReply,
 ) => {
   const userId = Number(req.params.userid);
