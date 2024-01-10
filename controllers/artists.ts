@@ -34,7 +34,7 @@ type GetArtistByUserIdRequest = FastifyRequest<{
 
 type AddArtistRatingRequest = FastifyRequest<{
   Params: { id: string };
-  Body: { rating: number; artistId: number; userId?: number };
+  Body: { rating: number; artistId: number; userId: number };
 }>;
 
 export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -270,7 +270,7 @@ export const addArtistRating = async (
       data: {
         artistId,
         rating,
-        userId: userId ? userId : null,
+        userId,
       },
     });
 
