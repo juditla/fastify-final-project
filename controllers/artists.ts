@@ -59,7 +59,6 @@ export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
     const ratingMatchingArtist = ratingsFromDatabase.find(
       (rating) => rating.artistId === artist.id,
     );
-    console.log(ratingMatchingArtist);
     return {
       ...artist,
       ratingAverage: ratingMatchingArtist?._avg.rating?.toFixed(2) || 0,
@@ -263,8 +262,8 @@ export const addArtistRating = async (
   reply: FastifyReply,
 ) => {
   const { rating, userId } = req.body;
-  const artistId = Number(req.params.id);
   try {
+    const artistId = Number(req.params.id);
     // add new rating
     const newArtistRating = await prisma.artistRating.create({
       data: {
