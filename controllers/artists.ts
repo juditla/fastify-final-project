@@ -52,11 +52,13 @@ export const getArtistByUserId = async (
   reply: FastifyReply,
 ) => {
   const userId = Number(req.params.userid);
+  try {
   const artist = await prisma.artist.findFirst({
     where: {
       userId,
     },
     select: {
+        id: true,
       name: true,
       userId: true,
       studioId: true,
@@ -77,7 +79,31 @@ export const getArtistByUserId = async (
       },
     },
   });
-  await reply.send(artist);
+
+    if (artist) {
+      const artistRating = await prisma.artistRating.aggregate({
+        _avg: {
+          rating: true,
+        },
+        _count: {
+          rating: true,
+        },
+        where: {
+          artistId: artist.id,
+        },
+      });
+
+      const artistWithRating = {
+        ...artist,
+        ratingAverage: artistRating._avg.rating,
+        ratingCount: artistRating._count.rating,
+      };
+      console.log(artistWithRating);
+      await reply.code(200).send(artistWithRating);
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const artistSchema = z.object({
