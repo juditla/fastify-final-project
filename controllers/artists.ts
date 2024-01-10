@@ -44,7 +44,30 @@ export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
       tattooImages: true,
     },
   });
-  await reply.send(artistsFromDatabase);
+
+  const ratingsFromDatabase = await prisma.artistRating.groupBy({
+    by: ['artistId'],
+    _avg: {
+      rating: true,
+    },
+    _count: {
+      rating: true,
+    },
+  });
+
+  const artistFromDatabaseWithRating = artistsFromDatabase.map((artist) => {
+    const ratingMatchingArtist = ratingsFromDatabase.find(
+      (rating) => rating.artistId === artist.id,
+    );
+    console.log(ratingMatchingArtist);
+    return {
+      ...artist,
+      ratingAverage: ratingMatchingArtist?._avg.rating || 0,
+      ratingCount: ratingMatchingArtist?._count.rating || 0,
+    };
+  });
+
+  await reply.send(artistFromDatabaseWithRating);
 };
 
 export const getArtistByUserId = async (
@@ -53,32 +76,32 @@ export const getArtistByUserId = async (
 ) => {
   const userId = Number(req.params.userid);
   try {
-  const artist = await prisma.artist.findFirst({
-    where: {
-      userId,
-    },
-    select: {
+    const artist = await prisma.artist.findFirst({
+      where: {
+        userId,
+      },
+      select: {
         id: true,
-      name: true,
-      userId: true,
-      studioId: true,
-      description: true,
-      style: true,
-      tattooImages: true,
-      user: {
-        select: {
-          avatar: true,
-          firstName: true,
+        name: true,
+        userId: true,
+        studioId: true,
+        description: true,
+        style: true,
+        tattooImages: true,
+        user: {
+          select: {
+            avatar: true,
+            firstName: true,
+          },
+        },
+        studio: {
+          select: {
+            name: true,
+            id: true,
+          },
         },
       },
-      studio: {
-        select: {
-          name: true,
-          id: true,
-        },
-      },
-    },
-  });
+    });
 
     if (artist) {
       const artistRating = await prisma.artistRating.aggregate({
