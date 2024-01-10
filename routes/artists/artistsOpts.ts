@@ -118,12 +118,7 @@ export const postArtistRatingOpts = {
       id: { type: 'number' },
     },
     response: {
-      200: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' },
-        },
-      },
+      200: Artist,
     },
   },
 };
