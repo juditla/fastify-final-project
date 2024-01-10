@@ -62,7 +62,7 @@ export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
     console.log(ratingMatchingArtist);
     return {
       ...artist,
-      ratingAverage: ratingMatchingArtist?._avg.rating || 0,
+      ratingAverage: ratingMatchingArtist?._avg.rating?.toFixed(2) || 0,
       ratingCount: ratingMatchingArtist?._count.rating || 0,
     };
   });
@@ -118,10 +118,9 @@ export const getArtistByUserId = async (
 
       const artistWithRating = {
         ...artist,
-        ratingAverage: artistRating._avg.rating,
-        ratingCount: artistRating._count.rating,
+        ratingAverage: artistRating._avg.rating?.toFixed(2) || 0,
+        ratingCount: artistRating._count.rating || 0,
       };
-      console.log(artistWithRating);
       await reply.code(200).send(artistWithRating);
     }
   } catch (error) {
@@ -266,6 +265,7 @@ export const addArtistRating = async (
   const { rating, userId } = req.body;
   const artistId = Number(req.params.id);
   try {
+    // add new rating
     const newArtistRating = await prisma.artistRating.create({
       data: {
         artistId,
@@ -273,8 +273,54 @@ export const addArtistRating = async (
         userId,
       },
     });
+    // get artist with new rating for response
+    const artist = await prisma.artist.findFirst({
+      where: {
+        id: artistId,
+      },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        studioId: true,
+        description: true,
+        style: true,
+        tattooImages: true,
+        user: {
+          select: {
+            avatar: true,
+            firstName: true,
+          },
+        },
+        studio: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+    });
 
-    await reply.code(201).send({ message: 'artist was rated' });
+    if (artist && newArtistRating) {
+      const artistRating = await prisma.artistRating.aggregate({
+        _avg: {
+          rating: true,
+        },
+        _count: {
+          rating: true,
+        },
+        where: {
+          artistId: artist.id,
+        },
+      });
+
+      const artistWithRating = {
+        ...artist,
+        ratingAverage: artistRating._avg.rating?.toFixed(2) || 0,
+        ratingCount: artistRating._count.rating || 0,
+      };
+      await reply.code(201).send(artistWithRating);
+    }
   } catch (error) {
     await reply.code(400).send({ message: 'error rating the artist' });
   }
