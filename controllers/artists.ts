@@ -124,7 +124,7 @@ export const getArtistByUserId = async (
       await reply.code(200).send(artistWithRating);
     }
   } catch (error) {
-    console.log(error);
+    await reply.code(400).send({ message: 'artist could not be found' });
   }
 };
 
