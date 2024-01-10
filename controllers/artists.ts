@@ -32,6 +32,11 @@ type GetArtistByUserIdRequest = FastifyRequest<{
   Params: { userid: string };
 }>;
 
+type AddArtistRatingRequest = FastifyRequest<{
+  Params: { id: string };
+  Body: { rating: number; artistId: number; userId?: number };
+}>;
+
 export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
   const artistsFromDatabase = await prisma.artist.findMany({
     include: {
@@ -202,5 +207,26 @@ export const updateArtist = async (
     } catch (error) {
       await reply.code(400).send({ message: 'error updating artist' });
     }
+  }
+};
+
+export const addArtistRating = async (
+  req: AddArtistRatingRequest,
+  reply: FastifyReply,
+) => {
+  const { rating, userId } = req.body;
+  const artistId = Number(req.params.id);
+  try {
+    const newArtistRating = await prisma.artistRating.create({
+      data: {
+        artistId,
+        rating,
+        userId: userId ? userId : null,
+      },
+    });
+
+    await reply.code(201).send({ message: 'artist was rated' });
+  } catch (error) {
+    await reply.code(400).send({ message: 'error rating the artist' });
   }
 };
