@@ -36,7 +36,7 @@ export function artistRoutes(
   // Update artist
   fastify.put('/artists/:id', updateArtistOpts, updateArtist);
 
-  // Rate artist
+  // Add artist rating
   fastify.post('/artists/ratings/:id', postArtistRatingOpts, addArtistRating);
 
   done();
