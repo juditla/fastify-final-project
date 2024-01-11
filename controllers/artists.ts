@@ -265,7 +265,7 @@ export const addArtistRating = async (
   try {
     const artistId = Number(req.params.id);
     // add new rating
-    const newArtistRating = await prisma.artistRating.create({
+    await prisma.artistRating.create({
       data: {
         artistId,
         rating,
