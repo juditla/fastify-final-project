@@ -117,6 +117,10 @@ export const postArtistRatingOpts = {
     params: {
       id: { type: 'number' },
     },
+    body: {
+      rating: { type: 'number' },
+      userId: { type: 'number' },
+    },
     response: {
       200: Artist,
     },
