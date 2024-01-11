@@ -300,7 +300,7 @@ export const addArtistRating = async (
       },
     });
 
-    if (artist && newArtistRating) {
+    if (artist) {
       const artistRating = await prisma.artistRating.aggregate({
         _avg: {
           rating: true,
