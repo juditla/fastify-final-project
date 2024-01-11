@@ -8,16 +8,16 @@ datasource db {
 }
 
 model Studio {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(30)
-  address    String   @db.VarChar(50)
-  city       String   @default("Vienna") @db.VarChar(30)
-  postalCode Int      @map("postal_code")
-  longitude  String?  @db.VarChar(30)
-  latitude   String?  @db.VarChar(30)
-  ownerId    Int      @map("owner_id")
-  artist     Artist[]
-  owner      User     @relation(fields: [ownerId], references: [id])
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(30)
+  address      String         @db.VarChar(50)
+  city         String         @default("Vienna") @db.VarChar(30)
+  postalCode   Int            @map("postal_code")
+  longitude    String?        @db.VarChar(30)
+  latitude     String?        @db.VarChar(30)
+  ownerId      Int            @map("owner_id")
+  artist       Artist[]
+  owner        User           @relation(fields: [ownerId], references: [id])
   studioImages StudioImages[]
 
   @@unique([name, address, postalCode])
@@ -33,32 +33,33 @@ model Artist {
   studio       Studio?        @relation(fields: [studioId], references: [id])
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   tattooImages TattooImages[]
+  artistRating artistRating[]
 }
 
 model TattooImages {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(30)
-  picture    String   @db.VarChar(100)
-  picturePublicId          String?        @db.VarChar(30) @map("picture_public_id")
-  artistId   Int      @map("artist_id")
-  style      String
-  isWannado  Boolean  @map("is_wannado")
-  isReserved Boolean  @map("is_reserved")
-  isDone     Boolean  @map("is_done")
-  artist     Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createDate DateTime @default(now()) @map("create_date") @db.Timestamp()
+  id              Int      @id @default(autoincrement())
+  name            String   @db.VarChar(30)
+  picture         String   @db.VarChar(100)
+  picturePublicId String?  @map("picture_public_id") @db.VarChar(30)
+  artistId        Int      @map("artist_id")
+  style           String
+  isWannado       Boolean  @map("is_wannado")
+  isReserved      Boolean  @map("is_reserved")
+  isDone          Boolean  @map("is_done")
+  artist          Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createDate      DateTime @default(now()) @map("create_date") @db.Timestamp()
 
   @@map("Tattoo_Images")
 }
 
 model StudioImages {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(30)
-  picture    String   @db.VarChar(100)
-  picturePublicId          String?        @db.VarChar(30)@map("picture_public_id")
-  studioId   Int @map("studio_id")
-  studio     Studio   @relation(fields: [studioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createDate DateTime @default(now()) @map("create_date") @db.Timestamp()
+  id              Int      @id @default(autoincrement())
+  name            String   @db.VarChar(30)
+  picture         String   @db.VarChar(100)
+  picturePublicId String?  @map("picture_public_id") @db.VarChar(30)
+  studioId        Int      @map("studio_id")
+  studio          Studio   @relation(fields: [studioId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createDate      DateTime @default(now()) @map("create_date") @db.Timestamp()
 
   @@map("Studio_Images")
 }
@@ -77,8 +78,8 @@ model User {
   firstName               String         @map("first_name") @db.VarChar(30)
   lastName                String         @map("last_name") @db.VarChar(30)
   password                String         @db.VarChar(60)
-  avatar                  String?         @db.VarChar(100)
-  avatarPublicId          String?        @db.VarChar(30) @map("avatar_public_id")
+  avatar                  String?        @db.VarChar(100)
+  avatarPublicId          String?        @map("avatar_public_id") @db.VarChar(30)
   artist                  Artist?
   studio                  Studio[]
   role                    Role           @relation(fields: [roleId], references: [id])
@@ -86,6 +87,7 @@ model User {
   conversationOwner       Conversation[] @relation("ConversationOwner")
   conversationParticipant Conversation[] @relation("ConversationParticipant")
   message                 Message[]
+  artistRating            artistRating[]
 }
 
 model Session {
@@ -104,6 +106,7 @@ model Conversation {
   participant   User      @relation("ConversationParticipant", fields: [participantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createDate    DateTime  @default(now()) @map("create_date") @db.Timestamp()
   message       Message[]
+
   @@unique([ownerId, participantId])
 }
 
@@ -112,7 +115,16 @@ model Message {
   createDate     DateTime     @default(now()) @map("create_date") @db.Timestamp()
   conversationId Int          @map("conversation_id")
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  text        String
+  text           String
   senderId       Int          @map("sender_id")
   sender         User         @relation(fields: [senderId], references: [id])
+}
+
+model artistRating {
+  id       Int    @id @default(autoincrement())
+  artistId Int    @map("artist_id")
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  rating   Int
+  userId   Int    @map("user_id")
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

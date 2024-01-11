@@ -13,7 +13,7 @@ export const loginOpts = {
         type: 'object',
         properties: {
           token: { type: 'string' },
-          expiresAt: { type: 'number' },
+          expiryTimestamp: { type: 'number' },
         },
       },
     },

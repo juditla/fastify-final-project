@@ -32,6 +32,11 @@ type GetArtistByUserIdRequest = FastifyRequest<{
   Params: { userid: string };
 }>;
 
+type AddArtistRatingRequest = FastifyRequest<{
+  Params: { id: string };
+  Body: { rating: number; artistId: number; userId: number };
+}>;
+
 export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
   const artistsFromDatabase = await prisma.artist.findMany({
     include: {
@@ -39,7 +44,29 @@ export const getArtists = async (req: FastifyRequest, reply: FastifyReply) => {
       tattooImages: true,
     },
   });
-  await reply.send(artistsFromDatabase);
+
+  const ratingsFromDatabase = await prisma.artistRating.groupBy({
+    by: ['artistId'],
+    _avg: {
+      rating: true,
+    },
+    _count: {
+      rating: true,
+    },
+  });
+
+  const artistFromDatabaseWithRating = artistsFromDatabase.map((artist) => {
+    const ratingMatchingArtist = ratingsFromDatabase.find(
+      (rating) => rating.artistId === artist.id,
+    );
+    return {
+      ...artist,
+      ratingAverage: ratingMatchingArtist?._avg.rating?.toFixed(2) || 0,
+      ratingCount: ratingMatchingArtist?._count.rating || 0,
+    };
+  });
+
+  await reply.send(artistFromDatabaseWithRating);
 };
 
 export const getArtistByUserId = async (
@@ -47,32 +74,57 @@ export const getArtistByUserId = async (
   reply: FastifyReply,
 ) => {
   const userId = Number(req.params.userid);
-  const artist = await prisma.artist.findFirst({
-    where: {
-      userId,
-    },
-    select: {
-      name: true,
-      userId: true,
-      studioId: true,
-      description: true,
-      style: true,
-      tattooImages: true,
-      user: {
-        select: {
-          avatar: true,
-          firstName: true,
+  try {
+    const artist = await prisma.artist.findFirst({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        studioId: true,
+        description: true,
+        style: true,
+        tattooImages: true,
+        user: {
+          select: {
+            avatar: true,
+            firstName: true,
+          },
+        },
+        studio: {
+          select: {
+            name: true,
+            id: true,
+          },
         },
       },
-      studio: {
-        select: {
-          name: true,
-          id: true,
+    });
+
+    if (artist) {
+      const artistRating = await prisma.artistRating.aggregate({
+        _avg: {
+          rating: true,
         },
-      },
-    },
-  });
-  await reply.send(artist);
+        _count: {
+          rating: true,
+        },
+        where: {
+          artistId: artist.id,
+        },
+      });
+
+      const artistWithRating = {
+        ...artist,
+        ratingAverage: artistRating._avg.rating?.toFixed(2) || 0,
+        ratingCount: artistRating._count.rating || 0,
+      };
+      await reply.code(200).send(artistWithRating);
+    }
+  } catch (error) {
+    await reply.code(400).send({ message: 'artist could not be found' });
+  }
 };
 
 const artistSchema = z.object({
@@ -202,5 +254,73 @@ export const updateArtist = async (
     } catch (error) {
       await reply.code(400).send({ message: 'error updating artist' });
     }
+  }
+};
+
+export const addArtistRating = async (
+  req: AddArtistRatingRequest,
+  reply: FastifyReply,
+) => {
+  const { rating, userId } = req.body;
+  try {
+    const artistId = Number(req.params.id);
+    // add new rating
+    await prisma.artistRating.create({
+      data: {
+        artistId,
+        rating,
+        userId,
+      },
+    });
+    // get artist with new rating for response
+    const artist = await prisma.artist.findFirst({
+      where: {
+        id: artistId,
+      },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        studioId: true,
+        description: true,
+        style: true,
+        tattooImages: true,
+        user: {
+          select: {
+            avatar: true,
+            firstName: true,
+          },
+        },
+        studio: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (artist) {
+      const artistRating = await prisma.artistRating.aggregate({
+        _avg: {
+          rating: true,
+        },
+        _count: {
+          rating: true,
+        },
+        where: {
+          artistId: artist.id,
+        },
+      });
+
+      const artistWithRating = {
+        ...artist,
+        ratingAverage: artistRating._avg.rating?.toFixed(2) || 0,
+        ratingCount: artistRating._count.rating || 0,
+      };
+      await reply.code(201).send(artistWithRating);
+    }
+  } catch (error) {
+    await reply.code(400).send({ message: 'error rating the artist' });
   }
 };

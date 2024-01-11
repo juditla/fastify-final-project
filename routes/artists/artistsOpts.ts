@@ -21,6 +21,8 @@ export const Artist = {
     tattooImages: { type: 'array' },
     user: { avatar: { type: 'string' }, firstName: { type: 'string' } },
     studio: { name: { type: 'string' }, studioId: { type: 'number' } },
+    ratingCount: { type: 'number' },
+    ratingAverage: { type: 'number' },
   },
 };
 
@@ -105,6 +107,22 @@ export const updateArtistOpts = {
         description: { type: 'string' },
         style: { type: 'string' },
       },
+    },
+  },
+};
+
+export const postArtistRatingOpts = {
+  schema: {
+    tags: ['artists', 'rating'],
+    params: {
+      id: { type: 'number' },
+    },
+    body: {
+      rating: { type: 'number' },
+      userId: { type: 'number' },
+    },
+    response: {
+      200: Artist,
     },
   },
 };
